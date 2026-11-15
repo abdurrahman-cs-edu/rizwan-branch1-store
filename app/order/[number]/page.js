@@ -50,6 +50,9 @@ export default function OrderConfirmation() {
                 <span>Prepaid discount</span><span>− {formatPKR(order.discount)}</span>
               </div>
             )}
+            {order.shipping > 0 && (
+              <div className="flex justify-between"><span>Shipping</span><span>{formatPKR(order.shipping)}</span></div>
+            )}
             <div className="flex justify-between font-semibold"><span>Total</span><span>{formatPKR(order.total)}</span></div>
           </div>
           <p className="mt-3 text-stone-600">

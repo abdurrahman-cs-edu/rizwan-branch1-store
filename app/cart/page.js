@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCart, lineKey } from "@/components/CartProvider";
 import { formatPKR } from "@/lib/products";
-import { PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
+import { PREPAID_DISCOUNT_PERCENT, SHIPPING_FEE } from "@/lib/config";
 
 export default function CartPage() {
   const { items, subtotal, ready, setQty, remove } = useCart();
@@ -57,7 +57,7 @@ export default function CartPage() {
         </div>
         <p className="mt-1 text-xs text-green-700">
           Choose Advance / prepaid payment at checkout to get an additional {PREPAID_DISCOUNT_PERCENT}% discount.
-          Delivery charges, if any, are confirmed on WhatsApp.
+          A flat delivery charge of {formatPKR(SHIPPING_FEE)} is added at checkout.
         </p>
         <Link
           href="/checkout"

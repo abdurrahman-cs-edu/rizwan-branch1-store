@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import AdvancePaymentInfo from "@/components/AdvancePaymentInfo";
 import { supabase } from "@/lib/supabase";
-import { CITIES, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
+import { CITIES, PREPAID_DISCOUNT_PERCENT, SHIPPING_FEE } from "@/lib/config";
 import { formatPKR, normalizePhone } from "@/lib/products";
 
 // Rounded input with a floating label (like the rizwanclothing.com checkout).
@@ -94,7 +94,7 @@ export default function CheckoutPage() {
   const [serverError, setServerError] = useState("");
 
   const discount = payment === "advance" ? Math.round((subtotal * PREPAID_DISCOUNT_PERCENT) / 100) : 0;
-  const total = subtotal - discount;
+  const total = subtotal - discount + SHIPPING_FEE;
 
   function set(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -160,6 +160,7 @@ export default function CheckoutPage() {
           payment_method: payment,
           subtotal: data.subtotal,
           discount: data.discount,
+          shipping: data.shipping ?? SHIPPING_FEE,
           total: data.total,
           items: items.map((l) => ({ name: l.name, size: l.size, qty: l.qty })),
         })
@@ -220,7 +221,7 @@ export default function CheckoutPage() {
         )}
         <div className="flex justify-between">
           <span>Shipping</span>
-          <span className="text-stone-500">Confirmed on WhatsApp</span>
+          <span>{formatPKR(SHIPPING_FEE)}</span>
         </div>
         <div className="flex items-baseline justify-between pt-2 text-lg font-semibold text-stone-900">
           <span>Total</span>

@@ -11,6 +11,7 @@ const PREPAID_DISCOUNT_PERCENT = 5;
 const SIZES = ["S", "M", "L", "XL", "XXL"];
 const MAX_ORDERS_PER_PHONE_10MIN = 3;
 const MAX_ORDERS_PER_IP_HOUR = 10;
+const SHIPPING_FEE = 300; // flat delivery charge per order (PKR), added on the server
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -127,7 +128,8 @@ Deno.serve(async (req) => {
   }
 
   const discount = payment === "advance" ? Math.round((subtotal * PREPAID_DISCOUNT_PERCENT) / 100) : 0;
-  const total = subtotal - discount;
+  const shipping = SHIPPING_FEE;
+  const total = subtotal - discount + shipping;
 
   // ---------- Save ----------
   const { data: order, error: orderError } = await supabase
@@ -141,6 +143,7 @@ Deno.serve(async (req) => {
       payment_method: payment,
       subtotal,
       discount,
+      shipping,
       total,
       ip_hash: ipHash,
     })
@@ -163,6 +166,7 @@ Deno.serve(async (req) => {
     order_number: order.order_number,
     subtotal,
     discount,
+    shipping,
     total,
     payment_method: payment,
   });

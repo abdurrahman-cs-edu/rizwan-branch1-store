@@ -110,7 +110,8 @@ export default function OrdersAdmin() {
                 </ul>
                 <p>
                   Subtotal {formatPKR(o.subtotal)}
-                  {o.discount > 0 && ` · Prepaid discount − ${formatPKR(o.discount)}`} ·{" "}
+                  {o.discount > 0 && ` · Prepaid discount − ${formatPKR(o.discount)}`}
+                  {o.shipping > 0 && ` · Delivery ${formatPKR(o.shipping)}`} ·{" "}
                   <b>Total {formatPKR(o.total)}</b>
                 </p>
                 <div className="flex gap-2">
