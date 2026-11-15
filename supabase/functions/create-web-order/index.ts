@@ -159,6 +159,16 @@ Deno.serve(async (req) => {
   if (itemsError) {
     // Do not leave an order without items
     await supabase.from("web_orders").delete().eq("id", order.id);
+    // The database refuses an item when there is not enough stock in that size: OUT_OF_STOCK|name|size|left
+    const m = /OUT_OF_STOCK\|([^|]*)\|([^|]*)\|(\d+)/.exec(itemsError.message ?? "");
+    if (m) {
+      const left = Number(m[3]);
+      return json({
+        error: left > 0
+          ? `Sorry, only ${left} left in size ${m[2]} for ${m[1]}. Please reduce the quantity.`
+          : `Sorry, size ${m[2]} of ${m[1]} is sold out. Please choose another size.`,
+      }, 409);
+    }
     return json({ error: "Could not save your order. Please try again." }, 500);
   }
 

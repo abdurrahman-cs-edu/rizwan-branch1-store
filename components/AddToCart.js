@@ -12,8 +12,19 @@ const BIG_BUTTON =
 export default function AddToCart({ product }) {
   const { add } = useCart();
   const router = useRouter();
-  const [size, setSize] = useState("M");
+  // stock = {"S":3,"M":0,...}; null means the shop does not count quantity for this suit
+  const stock = product.stock && typeof product.stock === "object" ? product.stock : null;
+  const left = (s) => (stock ? Math.max(0, Number(stock[s]) || 0) : null);
+  const inStock = (s) => left(s) === null || left(s) > 0;
+
+  const [size, setSize] = useState(() => (inStock("M") ? "M" : SIZES.find(inStock) || "M"));
   const [qty, setQty] = useState(1);
+  const maxQty = Math.min(10, left(size) ?? 10);
+
+  function pickSize(s) {
+    setSize(s);
+    setQty((q) => Math.max(1, Math.min(q, Math.min(10, left(s) ?? 10))));
+  }
 
   if (product.sold_out) {
     return (
@@ -59,18 +70,25 @@ export default function AddToCart({ product }) {
             <button
               key={s}
               type="button"
-              onClick={() => setSize(s)}
+              onClick={() => pickSize(s)}
+              disabled={!inStock(s)}
+              title={inStock(s) ? undefined : "Sold out in this size"}
               className={
                 "min-w-12 border px-3 py-2 text-sm " +
-                (s === size
-                  ? "border-[#111] bg-[#111] text-white"
-                  : "border-stone-300 hover:border-stone-500")
+                (!inStock(s)
+                  ? "cursor-not-allowed border-stone-200 text-stone-300 line-through"
+                  : s === size
+                    ? "border-[#111] bg-[#111] text-white"
+                    : "border-stone-300 hover:border-stone-500")
               }
             >
               {s}
             </button>
           ))}
         </div>
+        {left(size) !== null && left(size) <= 5 && (
+          <p className="mt-2 text-xs text-red-600">Only {left(size)} left in size {size}</p>
+        )}
       </div>
 
       <div>
@@ -78,7 +96,7 @@ export default function AddToCart({ product }) {
         <div className="inline-flex items-center border border-stone-300">
           <button type="button" aria-label="Less" className="px-3 py-2" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
           <span className="w-10 text-center">{qty}</span>
-          <button type="button" aria-label="More" className="px-3 py-2" onClick={() => setQty((q) => Math.min(10, q + 1))}>+</button>
+          <button type="button" aria-label="More" className="px-3 py-2" onClick={() => setQty((q) => Math.min(maxQty, q + 1))}>+</button>
         </div>
       </div>
 

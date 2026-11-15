@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatPKR } from "@/lib/products";
-import { FABRIC_SUGGESTIONS, SEASONS } from "@/lib/config";
+import { FABRIC_SUGGESTIONS, SEASONS, SIZES } from "@/lib/config";
 import { BUCKET, resizeImage, slugify, storagePathFromUrl } from "@/lib/adminHelpers";
 
 const EMPTY = {
@@ -19,6 +19,7 @@ const EMPTY = {
   price: "",
   sale_percent: "",
   sale_active: false,
+  stock: { S: "", M: "", L: "", XL: "", XXL: "" },
   collection_slug: "",
   includes: "Shirt, Dupatta, Trouser",
   description: "",
@@ -74,6 +75,9 @@ export default function ProductsAdmin() {
         price: String(product.price ?? ""),
         sale_percent: product.sale_percent == null ? "" : String(product.sale_percent),
         sale_active: !!product.sale_active,
+        stock: Object.fromEntries(
+          SIZES.map((s) => [s, product.stock && product.stock[s] != null ? String(product.stock[s]) : ""])
+        ),
         collection_slug: product.collection_slug || "",
         fabric: product.fabric || "",
         color: product.color || "",
@@ -151,6 +155,12 @@ export default function ProductsAdmin() {
     if (salePct !== null && !(Number.isInteger(salePct) && salePct >= 1 && salePct <= 90)) return setMessage("Sale % must be a whole number from 1 to 90.");
     if (form.sale_active && salePct === null) return setMessage("Enter the sale % to turn the sale on.");
 
+    // Quantity per size: all boxes empty = quantity is not counted (null); otherwise empty boxes count as 0.
+    const anyStock = SIZES.some((s) => String(form.stock[s]).trim() !== "");
+    const stock = anyStock
+      ? Object.fromEntries(SIZES.map((s) => [s, Math.min(9999, parseInt(form.stock[s], 10) || 0)]))
+      : null;
+
     const payload = {
       name: form.name.trim(),
       slug: form.slug,
@@ -163,6 +173,7 @@ export default function ProductsAdmin() {
       price,
       sale_percent: salePct,
       sale_active: form.sale_active && salePct !== null,
+      stock,
       collection_slug: form.collection_slug || null,
       includes: form.includes.trim() || "Shirt, Dupatta, Trouser",
       description: form.description.trim() || null,
@@ -331,6 +342,29 @@ export default function ProductsAdmin() {
           <p className="mt-1 text-xs text-stone-500">Pick from the list or type your own. Leave empty to show the simple text below instead.</p>
         </div>
         <div>
+          <p className="mb-1 text-sm font-medium">Quantity in stock (per size)</p>
+          <div className="grid grid-cols-5 gap-2">
+            {SIZES.map((s) => (
+              <div key={s}>
+                <label className="mb-1 block text-center text-xs text-stone-600">{s}</label>
+                <input
+                  className={`${input} text-center`}
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={form.stock[s]}
+                  onChange={(e) => setForm((f) => ({ ...f, stock: { ...f.stock, [s]: e.target.value.replace(/[^\d]/g, "") } }))}
+                />
+              </div>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-stone-500">
+            How many pieces you have in each size. A size at 0 shows as sold out to customers, and when every size is 0 the
+            whole suit shows Sold out. Website orders reduce these numbers by themselves and cancelling an order adds them
+            back. For sales made in the shop, change the numbers here. Leave all boxes empty if you do not want to count
+            quantity (empty boxes count as 0 once you fill at least one).
+          </p>
+        </div>
+        <div>
           <label className="mb-1 block text-sm font-medium">Included pieces (simple text)</label>
           <input className={input} value={form.includes} onChange={(e) => setField("includes", e.target.value)} />
         </div>
@@ -419,6 +453,19 @@ export default function ProductsAdmin() {
                 {p.sale_active && p.sale_percent ? ` → ${formatPKR(Math.round((Number(p.price) * (100 - p.sale_percent)) / 100))} (${p.sale_percent}% off)` : ""}
                 {" · "}{p.collection_slug || "no collection"}
               </p>
+              {p.stock && (
+                <p className="text-xs text-stone-600">
+                  Stock:{" "}
+                  {SIZES.map((s) => {
+                    const n = Number(p.stock[s]) || 0;
+                    return (
+                      <span key={s} className={"mr-2 " + (n === 0 ? "text-red-600" : "")}>
+                        {s} {n}
+                      </span>
+                    );
+                  })}
+                </p>
+              )}
               <p className="text-xs">
                 {!p.is_visible && <span className="mr-2 rounded bg-stone-200 px-1.5">Hidden</span>}
                 {p.sold_out && <span className="mr-2 rounded bg-red-100 px-1.5 text-red-800">Sold out</span>}
