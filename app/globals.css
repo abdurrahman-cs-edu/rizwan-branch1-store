@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* Brand colours: placeholders until the design is decided */
+:root {
+  --brand: #1f2937;
+  --brand-contrast: #ffffff;
+  --background: #ffffff;
+  --foreground: #111827;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
