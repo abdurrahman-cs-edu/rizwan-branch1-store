@@ -142,7 +142,7 @@ export default function CheckoutPage() {
         </div>
 
         <div>
-          <label className="mb-1 block text-sm font-medium" htmlFor="notes">Note (optional)</label>
+          <label className="mb-1 block text-sm font-medium" htmlFor="notes">Order special instructions (optional)</label>
           <input id="notes" className={input} value={form.notes} onChange={set("notes")} maxLength={300} />
         </div>
 
@@ -158,7 +158,7 @@ export default function CheckoutPage() {
           <label className="flex cursor-pointer items-start gap-2 rounded border border-stone-300 p-3 text-sm">
             <input type="radio" name="payment" checked={payment === "advance"} onChange={() => setPayment("advance")} className="mt-1" />
             <span>
-              <span className="font-medium">Advance payment ({PREPAID_DISCOUNT_PERCENT}% off)</span>
+              <span className="font-medium">Advance / prepaid payment (additional {PREPAID_DISCOUNT_PERCENT}% discount)</span>
               <span className="block text-stone-500">Pay by bank transfer, JazzCash or Easypaisa.</span>
             </span>
           </label>
@@ -198,6 +198,12 @@ export default function CheckoutPage() {
         >
           {submitting ? "Placing order…" : "Place order"}
         </button>
+        <p className="text-center text-xs text-stone-500">
+          By placing your order you agree to our{" "}
+          <Link href="/policies/terms" className="underline">Terms of Service</Link> and{" "}
+          <Link href="/policies/refund" className="underline">Refund Policy</Link>. Your order is confirmed
+          once our team contacts you on WhatsApp.
+        </p>
       </form>
 
       <aside className="md:col-span-2">

@@ -4,32 +4,64 @@ import { effectivePrice } from "@/lib/products";
 
 const STEP = 12;
 
+const SORTS = [
+  { value: "featured", label: "Featured" },
+  { value: "name-asc", label: "Alphabetically, A-Z" },
+  { value: "name-desc", label: "Alphabetically, Z-A" },
+  { value: "price-asc", label: "Price, low to high" },
+  { value: "price-desc", label: "Price, high to low" },
+  { value: "oldest", label: "Date, old to new" },
+  { value: "newest", label: "Date, new to old" },
+];
+
 function sortProducts(list, sort) {
   const copy = [...list];
+  const added = (p) => new Date(p.website_added_at).getTime() || 0;
   if (sort === "price-asc") copy.sort((a, b) => effectivePrice(a) - effectivePrice(b));
   else if (sort === "price-desc") copy.sort((a, b) => effectivePrice(b) - effectivePrice(a));
-  else if (sort === "newest")
-    copy.sort((a, b) => new Date(b.website_added_at) - new Date(a.website_added_at));
+  else if (sort === "name-asc") copy.sort((a, b) => a.name.localeCompare(b.name));
+  else if (sort === "name-desc") copy.sort((a, b) => b.name.localeCompare(a.name));
+  else if (sort === "newest") copy.sort((a, b) => added(b) - added(a));
+  else if (sort === "oldest") copy.sort((a, b) => added(a) - added(b));
   return copy; // "featured" keeps the order from the database
 }
 
-// Product grid with filters (sort + availability) and a "View more" button.
+function toNumber(value) {
+  const n = Number(String(value || "").replace(/[^\d.]/g, ""));
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+// Product grid with filters (availability, price range, sort) and a "View more" button.
 // Filters are a plain GET form, so no JavaScript is needed.
 export default function CollectionView({ products, searchParams = {}, basePath, extraHidden = {} }) {
-  const sort = searchParams.sort || "featured";
+  const sort = SORTS.some((s) => s.value === searchParams.sort) ? searchParams.sort : "featured";
   const avail = searchParams.avail || "all";
+  const minPrice = toNumber(searchParams.min);
+  const maxPrice = toNumber(searchParams.max);
   const limit = Math.min(Math.max(parseInt(searchParams.limit, 10) || STEP, STEP), 120);
 
   let list = products;
   if (avail === "in") list = list.filter((p) => !p.sold_out);
+  if (minPrice !== null) list = list.filter((p) => effectivePrice(p) >= minPrice);
+  if (maxPrice !== null) list = list.filter((p) => effectivePrice(p) <= maxPrice);
   list = sortProducts(list, sort);
   const shown = list.slice(0, limit);
 
+  const highest = Math.max(0, ...products.map((p) => effectivePrice(p)));
+
   const next = new URLSearchParams();
-  for (const [k, v] of Object.entries({ ...extraHidden, sort, avail })) {
+  for (const [k, v] of Object.entries({
+    ...extraHidden,
+    sort,
+    avail,
+    min: minPrice ? String(minPrice) : "",
+    max: maxPrice ? String(maxPrice) : "",
+  })) {
     if (v) next.set(k, v);
   }
   next.set("limit", String(limit + STEP));
+
+  const field = "rounded border border-stone-300 px-2 py-1.5";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -39,21 +71,54 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
         ))}
         <label className="flex flex-col gap-1">
           <span className="text-xs text-stone-500">Availability</span>
-          <select name="avail" defaultValue={avail} className="rounded border border-stone-300 px-2 py-1.5">
+          <select name="avail" defaultValue={avail} className={field}>
             <option value="all">All</option>
             <option value="in">In stock</option>
           </select>
         </label>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-stone-500">
+            Price (Rs.){highest > 0 ? `, highest is ${highest.toLocaleString("en-PK")}` : ""}
+          </span>
+          <div className="flex items-center gap-2">
+            <input
+              name="min"
+              inputMode="numeric"
+              placeholder="From"
+              defaultValue={minPrice || ""}
+              className={`${field} w-24`}
+              aria-label="Lowest price"
+            />
+            <span className="text-stone-400">to</span>
+            <input
+              name="max"
+              inputMode="numeric"
+              placeholder="To"
+              defaultValue={maxPrice || ""}
+              className={`${field} w-24`}
+              aria-label="Highest price"
+            />
+          </div>
+        </div>
         <label className="flex flex-col gap-1">
           <span className="text-xs text-stone-500">Sort by</span>
-          <select name="sort" defaultValue={sort} className="rounded border border-stone-300 px-2 py-1.5">
-            <option value="featured">Featured</option>
-            <option value="newest">Newest</option>
-            <option value="price-asc">Price: low to high</option>
-            <option value="price-desc">Price: high to low</option>
+          <select name="sort" defaultValue={sort} className={field}>
+            {SORTS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
           </select>
         </label>
         <button className="rounded bg-[var(--brand)] px-4 py-1.5 text-[var(--brand-contrast)]">Apply</button>
+        {(avail !== "all" || minPrice || maxPrice || sort !== "featured") && (
+          <Link
+            href={`${basePath}${Object.keys(extraHidden).length ? "?" + new URLSearchParams(extraHidden).toString() : ""}`}
+            className="py-1.5 text-xs underline"
+          >
+            Reset
+          </Link>
+        )}
         <span className="ml-auto text-xs text-stone-500">{list.length} products</span>
       </form>
 

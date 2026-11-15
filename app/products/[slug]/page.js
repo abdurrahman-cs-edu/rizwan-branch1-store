@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/catalogue";
 import { effectivePrice, formatPKR, isOnSale } from "@/lib/products";
-import { SITE, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
+import { SITE, SIZES, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
 import ProductGallery from "@/components/ProductGallery";
+import ShareButton from "@/components/ShareButton";
 import AddToCart from "@/components/AddToCart";
 import ProductSection from "@/components/ProductSection";
 import DemoNotice from "@/components/DemoNotice";
@@ -46,6 +47,24 @@ export default async function ProductPage({ params }) {
   if (!product) notFound();
 
   const onSale = isOnSale(product);
+
+  // Shirt / dupatta / trouser lines, shown only for the parts that have a fabric.
+  const includedParts = [
+    { label: "Shirt", value: product.shirt_fabric },
+    { label: "Dupatta", value: product.dupatta_fabric },
+    { label: "Trouser", value: product.trouser_fabric },
+  ].filter((part) => part.value);
+
+  const details = [
+    { label: "Fabric", value: product.fabric },
+    { label: "Colour", value: product.color },
+    {
+      label: "Season",
+      value: product.season === "summer" ? "Summer collection" : product.season === "winter" ? "Winter collection" : "",
+    },
+    { label: "Sizes", value: SIZES.join(", ") },
+  ].filter((d) => d.value);
+
   const related = products
     .filter((p) => p.slug !== product.slug && p.collection_slug === product.collection_slug)
     .slice(0, 4);
@@ -96,29 +115,54 @@ export default async function ProductPage({ params }) {
             )}
           </p>
           <p className="mt-1 text-xs text-green-700">
-            Extra {PREPAID_DISCOUNT_PERCENT}% off when you pay in advance
+            Get an additional {PREPAID_DISCOUNT_PERCENT}% discount on prepaid orders
           </p>
 
-          <dl className="mt-5 space-y-2 text-sm">
-            {product.fabric && (
-              <div className="flex gap-2">
-                <dt className="w-24 font-medium">Fabric</dt>
-                <dd>{product.fabric}</dd>
+          {includedParts.length > 0 ? (
+            <div className="mt-5">
+              <h2 className="text-sm font-semibold">What&apos;s included</h2>
+              <ul className="mt-1 space-y-1 text-sm">
+                {includedParts.map((part) => (
+                  <li key={part.label}>
+                    <span className="font-medium">{part.label}:</span> {part.value}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            product.includes && (
+              <div className="mt-5">
+                <h2 className="text-sm font-semibold">What&apos;s included</h2>
+                <p className="mt-1 text-sm">{product.includes}</p>
               </div>
-            )}
-            {product.includes && (
-              <div className="flex gap-2">
-                <dt className="w-24 font-medium">Includes</dt>
-                <dd>{product.includes}</dd>
-              </div>
-            )}
-          </dl>
+            )
+          )}
+
+          {details.length > 0 && (
+            <div className="mt-5">
+              <h2 className="text-sm font-semibold">Product details</h2>
+              <dl className="mt-1 space-y-1 text-sm">
+                {details.map((d) => (
+                  <div key={d.label} className="flex gap-2">
+                    <dt className="w-24 shrink-0 font-medium">{d.label}</dt>
+                    <dd>{d.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
 
           {product.description && (
             <p className="mt-4 whitespace-pre-line text-sm text-stone-700">{product.description}</p>
           )}
 
           <AddToCart product={product} />
+
+          <p className="mt-4 text-xs text-stone-500">
+            Due to photographic lighting and different screen settings, colours may look slightly
+            different from the pictures.
+          </p>
+          <ShareButton title={product.name} />
         </div>
       </div>
 

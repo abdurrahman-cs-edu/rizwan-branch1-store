@@ -56,7 +56,8 @@ export default function CartPage() {
           <span className="font-semibold">{formatPKR(subtotal)}</span>
         </div>
         <p className="mt-1 text-xs text-green-700">
-          Choose Advance at checkout to get an extra {PREPAID_DISCOUNT_PERCENT}% off.
+          Choose Advance / prepaid payment at checkout to get an additional {PREPAID_DISCOUNT_PERCENT}% discount.
+          Delivery charges, if any, are confirmed on WhatsApp.
         </p>
         <Link
           href="/checkout"

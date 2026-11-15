@@ -10,6 +10,11 @@ const EMPTY = {
   name: "",
   slug: "",
   fabric: "",
+  color: "",
+  season: "",
+  shirt_fabric: "",
+  dupatta_fabric: "",
+  trouser_fabric: "",
   price: "",
   sale_price: "",
   collection_slug: "",
@@ -67,6 +72,11 @@ export default function ProductsAdmin() {
         sale_price: product.sale_price == null ? "" : String(product.sale_price),
         collection_slug: product.collection_slug || "",
         fabric: product.fabric || "",
+        color: product.color || "",
+        season: product.season || "",
+        shirt_fabric: product.shirt_fabric || "",
+        dupatta_fabric: product.dupatta_fabric || "",
+        trouser_fabric: product.trouser_fabric || "",
         description: product.description || "",
         images: product.images || [],
       });
@@ -140,6 +150,11 @@ export default function ProductsAdmin() {
       name: form.name.trim(),
       slug: form.slug,
       fabric: form.fabric.trim() || null,
+      color: form.color.trim() || null,
+      season: form.season || null,
+      shirt_fabric: form.shirt_fabric.trim() || null,
+      dupatta_fabric: form.dupatta_fabric.trim() || null,
+      trouser_fabric: form.trouser_fabric.trim() || null,
       price,
       sale_price: sale,
       collection_slug: form.collection_slug || null,
@@ -235,8 +250,32 @@ export default function ProductsAdmin() {
           </div>
         </div>
 
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium">Colour</label>
+            <input className={input} value={form.color} onChange={(e) => setField("color", e.target.value)} />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">Season</label>
+            <select className={input} value={form.season} onChange={(e) => setField("season", e.target.value)}>
+              <option value="">Not set</option>
+              <option value="summer">Summer</option>
+              <option value="winter">Winter</option>
+            </select>
+          </div>
+        </div>
+
         <div>
-          <label className="mb-1 block text-sm font-medium">What is included</label>
+          <p className="mb-1 text-sm font-medium">What is included (fabric of each piece)</p>
+          <div className="grid grid-cols-3 gap-3">
+            <input className={input} placeholder="Shirt, e.g. Embroidered Lawn" value={form.shirt_fabric} onChange={(e) => setField("shirt_fabric", e.target.value)} />
+            <input className={input} placeholder="Dupatta, e.g. Embroidered Chiffon" value={form.dupatta_fabric} onChange={(e) => setField("dupatta_fabric", e.target.value)} />
+            <input className={input} placeholder="Trouser, e.g. Lawn" value={form.trouser_fabric} onChange={(e) => setField("trouser_fabric", e.target.value)} />
+          </div>
+          <p className="mt-1 text-xs text-stone-500">Leave these empty to show the simple text below instead.</p>
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium">Included pieces (simple text)</label>
           <input className={input} value={form.includes} onChange={(e) => setField("includes", e.target.value)} />
         </div>
         <div>
