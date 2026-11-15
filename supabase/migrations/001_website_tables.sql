@@ -1,5 +1,5 @@
 -- =====================================================================
--- 001_website_tables.sql
+-- 001_website_tables.sql   (ALREADY APPLIED to the Website project; kept as a record)
 -- For the NEW, separate Supabase project of the website
 -- (wmsyollcbgqfvaslivjx). It has no link to the shop's sales software.
 --
