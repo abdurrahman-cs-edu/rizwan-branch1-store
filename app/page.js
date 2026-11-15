@@ -3,6 +3,7 @@ import { SITE } from "@/lib/config";
 import {
   getCatalogue,
   getCollections,
+  getHomeCover,
   getHomeSections,
   getReviews,
   getTrendingSlugs,
@@ -16,13 +17,21 @@ import DemoNotice from "@/components/DemoNotice";
 export const revalidate = 60;
 
 export default async function Home() {
-  const [{ products, isDemo }, collections, sections, trendingSlugs, reviews] = await Promise.all([
+  const [{ products, isDemo }, collections, sections, trendingSlugs, reviews, cover] = await Promise.all([
     getCatalogue(),
     getCollections(),
     getHomeSections(),
     getTrendingSlugs(),
     getReviews(),
+    getHomeCover(),
   ]);
+  // Cover photo: the one uploaded in the admin panel, otherwise the photo of the first suit.
+  const coverUrl =
+    cover?.url ||
+    products.find((p) => !p.sold_out && p.images?.[0])?.images[0] ||
+    products.find((p) => p.images?.[0])?.images[0] ||
+    null;
+  const coverDark = cover?.dark ?? 0.55;
   // The "On sale" shortcut and filter only appear while at least one suit is on sale.
   const saleOn = products.some((p) => isOnSale(p) && !p.sold_out);
 
@@ -63,12 +72,22 @@ export default async function Home() {
     <>
       <DemoNotice show={isDemo} />
 
-      <section className="bg-stone-100 px-4 py-14 text-center">
-        <h1 className="text-3xl sm:text-5xl">{SITE.name}</h1>
-        <p className="mt-3 text-stone-600">{SITE.tagline}</p>
+      <section className="relative isolate overflow-hidden bg-stone-900 px-4 py-20 text-center text-white sm:py-32">
+        {coverUrl && (
+          <img
+            src={coverUrl}
+            alt=""
+            fetchPriority="high"
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-[center_30%]"
+          />
+        )}
+        {/* Dark layer so the writing is easy to read on any photo */}
+        <div className="absolute inset-0 -z-10" style={{ background: `rgba(0,0,0,${coverDark})` }} />
+        <h1 className="text-3xl sm:text-5xl [text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">{SITE.name}</h1>
+        <p className="mt-3 text-stone-100 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">{SITE.tagline}</p>
         <Link
           href="/collections"
-          className="mt-6 inline-block bg-[#111] px-8 py-3 text-[13px] font-bold uppercase tracking-[0.3em] text-white hover:opacity-85"
+          className="mt-8 inline-block bg-white px-8 py-3 text-[13px] font-bold uppercase tracking-[0.3em] text-[#111] hover:bg-stone-200"
         >
           Shop all collections
         </Link>
@@ -92,13 +111,6 @@ export default async function Home() {
           )}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-stone-600">
-          <span className="uppercase tracking-[0.15em]">Sort suits:</span>
-          <Link href="/collections?sort=price-asc" className="underline">Price, low to high</Link>
-          <Link href="/collections?sort=price-desc" className="underline">Price, high to low</Link>
-          <Link href="/collections?sort=newest" className="underline">New to old</Link>
-          {saleOn && <Link href="/collections?avail=sale" className="font-semibold text-red-600 underline">On sale</Link>}
-        </div>
       </section>
 
       <ReviewsStrip title="Customer feedback" reviews={reviews} />

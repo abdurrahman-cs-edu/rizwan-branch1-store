@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
+import FilterToggle from "@/components/FilterToggle";
 import { effectivePrice, isOnSale } from "@/lib/products";
 
 const STEP = 12;
@@ -65,11 +66,14 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
   }
   next.set("limit", String(limit + STEP));
 
-  const field = "rounded border border-stone-300 px-2 py-1.5";
+  const field = "rounded border border-stone-300 bg-white px-2 py-1.5";
+  const activeCount = [avail !== "all", Boolean(minPrice || maxPrice), sort !== "featured"].filter(Boolean).length;
+  const resetHref = `${basePath}${Object.keys(extraHidden).length ? "?" + new URLSearchParams(extraHidden).toString() : ""}`;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <form action={basePath} className="mb-6 flex flex-wrap items-end gap-3 text-sm">
+      <FilterToggle activeCount={activeCount} total={list.length} resetHref={resetHref}>
+      <form action={basePath} className="flex flex-wrap items-end gap-3 text-sm">
         {Object.entries(extraHidden).map(([k, v]) => (
           <input key={k} type="hidden" name={k} value={v} />
         ))}
@@ -115,17 +119,9 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
             ))}
           </select>
         </label>
-        <button className="rounded bg-[var(--brand)] px-4 py-1.5 text-[var(--brand-contrast)]">Apply</button>
-        {(avail !== "all" || minPrice || maxPrice || sort !== "featured") && (
-          <Link
-            href={`${basePath}${Object.keys(extraHidden).length ? "?" + new URLSearchParams(extraHidden).toString() : ""}`}
-            className="py-1.5 text-xs underline"
-          >
-            Reset
-          </Link>
-        )}
-        <span className="ml-auto text-xs text-stone-500">{list.length} products</span>
+        <button className="bg-[#111] px-5 py-1.5 text-[13px] uppercase tracking-[0.2em] text-white">Apply</button>
       </form>
+      </FilterToggle>
 
       {shown.length === 0 ? (
         <p className="py-12 text-center text-stone-500">No products found.</p>
