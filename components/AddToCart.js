@@ -32,7 +32,10 @@ export default function AddToCart({ product }) {
   return (
     <div className="mt-4 space-y-4">
       <div>
-        <p className="mb-2 text-sm font-medium">Size</p>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium">Size</p>
+          <a href="#size-chart" className="text-xs text-stone-600 underline">Size guide</a>
+        </div>
         <div className="flex flex-wrap gap-2">
           {SIZES.map((s) => (
             <button

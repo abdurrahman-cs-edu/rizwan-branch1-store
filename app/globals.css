@@ -6,6 +6,9 @@
   --brand-contrast: #ffffff;
   --background: #ffffff;
   --foreground: #111827;
+  /* Checkout accent (same blue as rizwanclothing.com checkout) */
+  --accent: #005bd3;
+  --accent-soft: #f2f6ff;
 }
 
 body {

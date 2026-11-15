@@ -5,6 +5,7 @@ import { effectivePrice, formatPKR, isOnSale } from "@/lib/products";
 import { SITE, SIZES, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
 import ProductGallery from "@/components/ProductGallery";
 import ShareButton from "@/components/ShareButton";
+import SizeChart from "@/components/SizeChart";
 import AddToCart from "@/components/AddToCart";
 import ProductSection from "@/components/ProductSection";
 import DemoNotice from "@/components/DemoNotice";
@@ -163,6 +164,8 @@ export default async function ProductPage({ params }) {
             different from the pictures.
           </p>
           <ShareButton title={product.name} />
+
+          <SizeChart />
         </div>
       </div>
 

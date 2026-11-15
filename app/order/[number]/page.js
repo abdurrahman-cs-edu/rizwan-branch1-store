@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { PAYMENT_DETAILS, SITE } from "@/lib/config";
+import { SITE } from "@/lib/config";
+import AdvancePaymentInfo from "@/components/AdvancePaymentInfo";
 import { formatPKR, waLink } from "@/lib/products";
 
 export default function OrderConfirmation() {
@@ -60,23 +61,15 @@ export default function OrderConfirmation() {
       {advance && (
         <div className="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-left text-sm">
           <p className="font-semibold">Next step: send your payment</p>
-          <div className="mt-2 space-y-1">
-            {(PAYMENT_DETAILS.bank.accountNumber || PAYMENT_DETAILS.bank.iban) && (
-              <p><b>Bank:</b> {PAYMENT_DETAILS.bank.title} {PAYMENT_DETAILS.bank.accountTitle} {PAYMENT_DETAILS.bank.accountNumber} {PAYMENT_DETAILS.bank.iban}</p>
-            )}
-            {PAYMENT_DETAILS.jazzcash.number && (
-              <p><b>JazzCash:</b> {PAYMENT_DETAILS.jazzcash.accountTitle} {PAYMENT_DETAILS.jazzcash.number}</p>
-            )}
-            {PAYMENT_DETAILS.easypaisa.number && (
-              <p><b>Easypaisa:</b> {PAYMENT_DETAILS.easypaisa.accountTitle} {PAYMENT_DETAILS.easypaisa.number}</p>
-            )}
+          <div className="mt-3">
+            <AdvancePaymentInfo />
           </div>
           {paymentLink ? (
             <a
               href={paymentLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 block rounded bg-green-600 py-2 text-center text-white"
+              className="mt-4 block rounded-lg bg-green-600 py-3 text-center font-medium text-white"
             >
               Send payment screenshot on WhatsApp
             </a>
