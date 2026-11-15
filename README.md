@@ -1,6 +1,7 @@
 # Rizwan Clothing: Branch 1 Online Store
 
 Customer-facing store for Branch 1 (Block B, Phase 1, City Center, Qambar, Swat).
+The website has its OWN Supabase project (separate from the shop's sales software).
 Built with Next.js (App Router), Tailwind CSS and Supabase.
 
 ## Run on your computer

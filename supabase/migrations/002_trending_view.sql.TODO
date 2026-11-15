@@ -1,7 +1,0 @@
--- 002_trending_view.sql   STATUS: NOT WRITTEN YET.
---
--- Needs the exact column names of the existing "sales" table (which column
--- holds the design, the quantity and the sale date). Once those are known
--- this file will create the "website_trending" view:
---   slug, units   (best sellers of the last 14 days)
--- Until then the home page "Trending these days" shows in-stock products.
