@@ -13,7 +13,7 @@ export default function Footer() {
     <footer className="mt-16 border-t border-stone-200 bg-stone-50">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <h3 className="mb-3 font-semibold">{SITE.name}</h3>
+          <img src="/logo.png" alt={SITE.name} className="mb-3 h-12 w-auto mix-blend-multiply" />
           <p className="text-sm text-stone-600">{SITE.branch}</p>
           <p className="mt-1 text-sm text-stone-600">{SITE.address}</p>
           <Link href="/branch" className="mt-2 inline-block text-sm underline">

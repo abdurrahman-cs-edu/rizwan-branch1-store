@@ -22,9 +22,9 @@ export default function Header() {
           {menuOpen ? "✕" : "☰"}
         </button>
 
-        <Link href="/" className="text-lg font-bold tracking-wide sm:text-xl">
-          {SITE.name}
-          <span className="ml-2 hidden text-xs font-normal text-stone-500 sm:inline">{SITE.branch}</span>
+        <Link href="/" className="flex items-center gap-2" aria-label={`${SITE.name} home`}>
+          <img src="/logo.png" alt={SITE.name} className="h-10 w-auto sm:h-12" />
+          <span className="hidden text-xs text-stone-500 sm:inline">{SITE.branch}</span>
         </Link>
 
         <nav className="ml-6 hidden gap-6 text-sm md:flex">
