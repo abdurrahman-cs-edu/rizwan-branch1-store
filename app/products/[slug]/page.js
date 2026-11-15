@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProductBySlug } from "@/lib/catalogue";
+import { getProductBySlug, getSizeChart } from "@/lib/catalogue";
 import { effectivePrice, formatPKR, isOnSale } from "@/lib/products";
 import { SITE, SIZES, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
 import ProductGallery from "@/components/ProductGallery";
@@ -46,6 +46,7 @@ export default async function ProductPage({ params }) {
   const { slug } = await params;
   const { product, products, isDemo } = await getProductBySlug(slug);
   if (!product) notFound();
+  const sizeChart = await getSizeChart();
 
   const onSale = isOnSale(product);
 
@@ -165,7 +166,7 @@ export default async function ProductPage({ params }) {
           </p>
           <ShareButton title={product.name} />
 
-          <SizeChart />
+          <SizeChart chart={sizeChart} />
         </div>
       </div>
 

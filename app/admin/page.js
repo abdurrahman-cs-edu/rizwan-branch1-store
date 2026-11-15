@@ -5,11 +5,13 @@ import { supabase } from "@/lib/supabase";
 import OrdersAdmin from "@/components/admin/OrdersAdmin";
 import ProductsAdmin from "@/components/admin/ProductsAdmin";
 import SectionsAdmin from "@/components/admin/SectionsAdmin";
+import SizeChartAdmin from "@/components/admin/SizeChartAdmin";
 
 const TABS = [
   ["orders", "Orders"],
   ["products", "Products"],
   ["home", "Home & Collections"],
+  ["sizes", "Size Chart"],
 ];
 
 function LoginForm() {
@@ -123,6 +125,7 @@ export default function AdminPage() {
       {tab === "orders" && <OrdersAdmin />}
       {tab === "products" && <ProductsAdmin />}
       {tab === "home" && <SectionsAdmin />}
+      {tab === "sizes" && <SizeChartAdmin />}
     </div>
   );
 }

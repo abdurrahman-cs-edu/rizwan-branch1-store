@@ -1,8 +1,9 @@
-import { SIZE_CHART } from "@/lib/config";
+import { SIZES, SIZE_CHART } from "@/lib/config";
 
-// Shirt size chart. Shown on every product page.
-export default function SizeChart() {
-  const { title, unit, sizes, rows } = SIZE_CHART;
+// Shirt size chart. Shown on every product page. The numbers come from the admin panel.
+export default function SizeChart({ chart = SIZE_CHART }) {
+  const { title = SIZE_CHART.title, unit = SIZE_CHART.unit, sizes, rows } = chart;
+  const missing = SIZES.filter((s) => !sizes.includes(s));
 
   return (
     <section id="size-chart" className="mt-8 scroll-mt-28">
@@ -23,8 +24,8 @@ export default function SizeChart() {
             {rows.map((r) => (
               <tr key={r.label}>
                 <th scope="row" className="px-3 py-2 text-left font-medium">{r.label}</th>
-                {r.values.map((v, i) => (
-                  <td key={i} className="px-3 py-2">{v}</td>
+                {sizes.map((_, i) => (
+                  <td key={i} className="px-3 py-2">{r.values?.[i] || "-"}</td>
                 ))}
               </tr>
             ))}
@@ -33,7 +34,10 @@ export default function SizeChart() {
       </div>
 
       <p className="mt-2 text-xs text-stone-500">
-        Not sure about your size, or want XXL measurements? Message us on WhatsApp and we will help.
+        {missing.length > 0
+          ? `Want ${missing.join(", ")} measurements, or not sure about your size? `
+          : "Not sure about your size? "}
+        Message us on WhatsApp and we will help.
       </p>
     </section>
   );
