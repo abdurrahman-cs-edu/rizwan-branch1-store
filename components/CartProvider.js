@@ -33,7 +33,7 @@ export function CartProvider({ children }) {
     } catch {}
   }, [items, ready]);
 
-  const add = useCallback((item) => {
+  const add = useCallback((item, options = {}) => {
     setItems((prev) => {
       const key = lineKey(item.slug, item.size);
       const found = prev.find((l) => lineKey(l.slug, l.size) === key);
@@ -44,7 +44,7 @@ export function CartProvider({ children }) {
       }
       return [...prev, { ...item, qty: Math.min(10, item.qty) }];
     });
-    setDrawerOpen(true);
+    if (!options.silent) setDrawerOpen(true);
   }, []);
 
   const setQty = useCallback((key, qty) => {

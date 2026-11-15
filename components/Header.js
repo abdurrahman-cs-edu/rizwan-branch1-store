@@ -12,30 +12,36 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
-        <button
-          type="button"
-          className="rounded p-2 text-xl md:hidden"
-          aria-label="Open menu"
-          onClick={() => setMenuOpen((v) => !v)}
-        >
-          {menuOpen ? "✕" : "☰"}
-        </button>
+      <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-2">
+        {/* Left: menu button (phones) or menu links (wide screens) */}
+        <div className="flex items-center">
+          <button
+            type="button"
+            className="-ml-2 rounded p-2 text-xl lg:hidden"
+            aria-label="Open menu"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            {menuOpen ? "✕" : "☰"}
+          </button>
+          <nav className="hidden gap-6 text-[13px] uppercase tracking-[0.18em] lg:flex">
+            {MENU.map((m) => (
+              <Link key={m.href} href={m.href} className="hover:underline">
+                {m.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
-        <Link href="/" className="flex items-center gap-2" aria-label={`${SITE.name} home`}>
-          <img src="/logo.png" alt={SITE.name} className="h-10 w-auto sm:h-12" />
-          <span className="hidden text-xs text-stone-500 sm:inline">{SITE.branch}</span>
+        {/* Centre: logo with the branch name under it */}
+        <Link href="/" className="flex flex-col items-center" aria-label={`${SITE.name} home`}>
+          <img src="/logo.png" alt={SITE.name} className="h-11 w-auto sm:h-14" />
+          <span className="font-display mt-0.5 text-[10px] uppercase tracking-[0.4em] text-stone-600 sm:text-xs">
+            {SITE.branch}
+          </span>
         </Link>
 
-        <nav className="ml-6 hidden gap-6 text-sm md:flex">
-          {MENU.map((m) => (
-            <Link key={m.href} href={m.href} className="hover:underline">
-              {m.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-1 text-sm">
+        {/* Right: search, log in, cart */}
+        <div className="flex items-center justify-end gap-1 text-sm">
           <button
             type="button"
             className="rounded p-2"
@@ -44,7 +50,7 @@ export default function Header() {
           >
             🔍
           </button>
-          <Link href="/account" className="hidden rounded p-2 hover:underline sm:inline">
+          <Link href="/account" className="hidden rounded p-2 text-[13px] uppercase tracking-[0.18em] hover:underline sm:inline">
             Log in
           </Link>
           <button
@@ -78,7 +84,7 @@ export default function Header() {
       )}
 
       {menuOpen && (
-        <nav className="border-t border-stone-200 bg-white px-4 py-2 md:hidden">
+        <nav className="border-t border-stone-200 bg-white px-4 py-2 lg:hidden">
           {MENU.map((m) => (
             <Link
               key={m.href}

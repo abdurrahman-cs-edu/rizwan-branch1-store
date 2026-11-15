@@ -1,4 +1,5 @@
 import "./globals.css";
+import { bodyFont, displayFont } from "@/lib/fonts";
 import { SITE } from "@/lib/config";
 import { CartProvider } from "@/components/CartProvider";
 import AnnouncementBar from "@/components/AnnouncementBar";
@@ -29,7 +30,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${displayFont.variable} ${bodyFont.variable}`}>
       <body className="flex min-h-screen flex-col">
         <CartProvider>
           <AnnouncementBar />

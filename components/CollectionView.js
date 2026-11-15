@@ -1,6 +1,6 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-import { effectivePrice } from "@/lib/products";
+import { effectivePrice, isOnSale } from "@/lib/products";
 
 const STEP = 12;
 
@@ -35,13 +35,17 @@ function toNumber(value) {
 // Filters are a plain GET form, so no JavaScript is needed.
 export default function CollectionView({ products, searchParams = {}, basePath, extraHidden = {} }) {
   const sort = SORTS.some((s) => s.value === searchParams.sort) ? searchParams.sort : "featured";
-  const avail = searchParams.avail || "all";
+  // "On sale" only exists as a choice while at least one suit is on sale.
+  const saleOn = products.some((p) => isOnSale(p) && !p.sold_out);
+  const availParam = searchParams.avail || "all";
+  const avail = availParam === "sale" && !saleOn ? "all" : availParam;
   const minPrice = toNumber(searchParams.min);
   const maxPrice = toNumber(searchParams.max);
   const limit = Math.min(Math.max(parseInt(searchParams.limit, 10) || STEP, STEP), 120);
 
   let list = products;
   if (avail === "in") list = list.filter((p) => !p.sold_out);
+  if (avail === "sale") list = list.filter((p) => isOnSale(p) && !p.sold_out);
   if (minPrice !== null) list = list.filter((p) => effectivePrice(p) >= minPrice);
   if (maxPrice !== null) list = list.filter((p) => effectivePrice(p) <= maxPrice);
   list = sortProducts(list, sort);
@@ -70,10 +74,11 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
           <input key={k} type="hidden" name={k} value={v} />
         ))}
         <label className="flex flex-col gap-1">
-          <span className="text-xs text-stone-500">Availability</span>
+          <span className="text-xs text-stone-500">Show</span>
           <select name="avail" defaultValue={avail} className={field}>
             <option value="all">All</option>
             <option value="in">In stock</option>
+            {saleOn && <option value="sale">On sale</option>}
           </select>
         </label>
         <div className="flex flex-col gap-1">

@@ -6,7 +6,7 @@ export default function ProductSection({ title, products, href }) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-4 flex items-end justify-between">
-        <h2 className="text-xl font-bold sm:text-2xl">{title}</h2>
+        <h2 className="text-xl uppercase tracking-[0.12em] sm:text-2xl">{title}</h2>
         {href && (
           <Link href={href} className="text-sm underline">
             View all

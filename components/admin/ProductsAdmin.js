@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatPKR } from "@/lib/products";
+import { FABRIC_SUGGESTIONS, SEASONS } from "@/lib/config";
 import { BUCKET, resizeImage, slugify, storagePathFromUrl } from "@/lib/adminHelpers";
 
 const EMPTY = {
@@ -16,7 +17,8 @@ const EMPTY = {
   dupatta_fabric: "",
   trouser_fabric: "",
   price: "",
-  sale_price: "",
+  sale_percent: "",
+  sale_active: false,
   collection_slug: "",
   includes: "Shirt, Dupatta, Trouser",
   description: "",
@@ -42,6 +44,7 @@ export default function ProductsAdmin() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [bulkPercent, setBulkPercent] = useState("30");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -69,7 +72,8 @@ export default function ProductsAdmin() {
         ...EMPTY,
         ...product,
         price: String(product.price ?? ""),
-        sale_price: product.sale_price == null ? "" : String(product.sale_price),
+        sale_percent: product.sale_percent == null ? "" : String(product.sale_percent),
+        sale_active: !!product.sale_active,
         collection_slug: product.collection_slug || "",
         fabric: product.fabric || "",
         color: product.color || "",
@@ -139,12 +143,13 @@ export default function ProductsAdmin() {
     e.preventDefault();
     setMessage("");
     const price = Number(form.price);
-    const sale = form.sale_price === "" ? null : Number(form.sale_price);
+    const salePct = form.sale_percent === "" ? null : Number(form.sale_percent);
 
     if (form.name.trim().length < 2) return setMessage("Please enter the product name.");
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(form.slug)) return setMessage("Slug can only have small letters, numbers and dashes.");
     if (!(price >= 0) || form.price === "") return setMessage("Please enter a valid price.");
-    if (sale !== null && !(sale > 0 && sale < price)) return setMessage("Sale price must be less than the price.");
+    if (salePct !== null && !(Number.isInteger(salePct) && salePct >= 1 && salePct <= 90)) return setMessage("Sale % must be a whole number from 1 to 90.");
+    if (form.sale_active && salePct === null) return setMessage("Enter the sale % to turn the sale on.");
 
     const payload = {
       name: form.name.trim(),
@@ -156,7 +161,8 @@ export default function ProductsAdmin() {
       dupatta_fabric: form.dupatta_fabric.trim() || null,
       trouser_fabric: form.trouser_fabric.trim() || null,
       price,
-      sale_price: sale,
+      sale_percent: salePct,
+      sale_active: form.sale_active && salePct !== null,
       collection_slug: form.collection_slug || null,
       includes: form.includes.trim() || "Shirt, Dupatta, Trouser",
       description: form.description.trim() || null,
@@ -186,6 +192,25 @@ export default function ProductsAdmin() {
     const { error } = await supabase.from("products").update({ [field]: !p[field] }).eq("id", p.id);
     if (error) return setMessage("Could not update the product.");
     setProducts((list) => list.map((x) => (x.id === p.id ? { ...x, [field]: !p[field] } : x)));
+  }
+
+  // Start / stop the same sale on every suit at once (the % stays saved when a sale is stopped).
+  async function startSaleAll() {
+    const pct = Number(bulkPercent);
+    if (!Number.isInteger(pct) || pct < 1 || pct > 90) return setMessage("Enter a sale % from 1 to 90.");
+    if (!window.confirm(`Start a ${pct}% sale on all ${products.length} suits?`)) return;
+    const { error } = await supabase.from("products").update({ sale_percent: pct, sale_active: true }).gt("id", 0);
+    if (error) return setMessage("Could not start the sale.");
+    setMessage(`${pct}% sale is ON for all suits.`);
+    load();
+  }
+
+  async function stopSaleAll() {
+    if (!window.confirm("Stop the sale on all suits? Prices go back to normal.")) return;
+    const { error } = await supabase.from("products").update({ sale_active: false }).gt("id", 0);
+    if (error) return setMessage("Could not stop the sale.");
+    setMessage("Sale is OFF for all suits.");
+    load();
   }
 
   async function onDelete(p) {
@@ -227,9 +252,21 @@ export default function ProductsAdmin() {
             <input className={input} inputMode="numeric" value={form.price} onChange={(e) => setField("price", e.target.value.replace(/[^\d.]/g, ""))} />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Sale price (optional)</label>
-            <input className={input} inputMode="numeric" value={form.sale_price} onChange={(e) => setField("sale_price", e.target.value.replace(/[^\d.]/g, ""))} />
+            <label className="mb-1 block text-sm font-medium">Sale % off (e.g. 30)</label>
+            <input className={input} inputMode="numeric" placeholder="Leave empty for no sale" value={form.sale_percent} onChange={(e) => setField("sale_percent", e.target.value.replace(/[^\d]/g, ""))} />
           </div>
+        </div>
+        <div className="rounded border border-stone-200 bg-stone-50 p-3 text-sm">
+          <label className="flex items-center gap-2 font-medium">
+            <input type="checkbox" checked={form.sale_active} onChange={(e) => setField("sale_active", e.target.checked)} />
+            Sale is ON for this suit
+          </label>
+          <p className="mt-1 text-xs text-stone-600">
+            {Number(form.price) > 0 && Number(form.sale_percent) >= 1 && Number(form.sale_percent) <= 90
+              ? `Customers will pay ${formatPKR(Math.round((Number(form.price) * (100 - Number(form.sale_percent))) / 100))} (${form.sale_percent}% off ${formatPKR(Number(form.price))}) while the sale is on.`
+              : "Type the % and tick the box to start the sale. Untick it to stop the sale (the % stays saved)."}
+            {" "}A glowing “% OFF” tag shows under the suit and it joins the Sale section and the “On sale” filter automatically.
+          </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -259,20 +296,39 @@ export default function ProductsAdmin() {
             <label className="mb-1 block text-sm font-medium">Season</label>
             <select className={input} value={form.season} onChange={(e) => setField("season", e.target.value)}>
               <option value="">Not set</option>
-              <option value="summer">Summer</option>
-              <option value="winter">Winter</option>
+              {SEASONS.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
             </select>
           </div>
         </div>
 
         <div>
           <p className="mb-1 text-sm font-medium">What is included (fabric of each piece)</p>
-          <div className="grid grid-cols-3 gap-3">
-            <input className={input} placeholder="Shirt, e.g. Embroidered Lawn" value={form.shirt_fabric} onChange={(e) => setField("shirt_fabric", e.target.value)} />
-            <input className={input} placeholder="Dupatta, e.g. Embroidered Chiffon" value={form.dupatta_fabric} onChange={(e) => setField("dupatta_fabric", e.target.value)} />
-            <input className={input} placeholder="Trouser, e.g. Lawn" value={form.trouser_fabric} onChange={(e) => setField("trouser_fabric", e.target.value)} />
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              ["shirt_fabric", "Shirt fabric", "shirt"],
+              ["dupatta_fabric", "Dupatta fabric (Chiffon, Net, …)", "dupatta"],
+              ["trouser_fabric", "Trouser fabric", "trouser"],
+            ].map(([field, label, key]) => (
+              <div key={field}>
+                <label className="mb-1 block text-xs text-stone-600">{label}</label>
+                <input
+                  className={input}
+                  list={`fabric-${key}`}
+                  placeholder="Choose or type"
+                  value={form[field]}
+                  onChange={(e) => setField(field, e.target.value)}
+                />
+                <datalist id={`fabric-${key}`}>
+                  {FABRIC_SUGGESTIONS[key].map((f) => (
+                    <option key={f} value={f} />
+                  ))}
+                </datalist>
+              </div>
+            ))}
           </div>
-          <p className="mt-1 text-xs text-stone-500">Leave these empty to show the simple text below instead.</p>
+          <p className="mt-1 text-xs text-stone-500">Pick from the list or type your own. Leave empty to show the simple text below instead.</p>
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium">Included pieces (simple text)</label>
@@ -332,6 +388,21 @@ export default function ProductsAdmin() {
         {message && <span className="text-sm text-stone-600">{message}</span>}
       </div>
 
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-stone-200 bg-stone-50 p-3 text-sm">
+        <span className="font-medium">Sale on all suits:</span>
+        <input
+          className="w-16 rounded border border-stone-300 px-2 py-1.5 text-center"
+          inputMode="numeric"
+          value={bulkPercent}
+          onChange={(e) => setBulkPercent(e.target.value.replace(/[^\d]/g, ""))}
+          aria-label="Sale percent"
+        />
+        <span>% off</span>
+        <button onClick={startSaleAll} className="rounded bg-[var(--brand)] px-3 py-1.5 text-[var(--brand-contrast)]">Start sale</button>
+        <button onClick={stopSaleAll} className="rounded border border-stone-300 px-3 py-1.5">Stop sale</button>
+        <span className="text-xs text-stone-500">For one suit only, use Edit.</span>
+      </div>
+
       {loading && <p className="text-sm text-stone-500">Loading…</p>}
       {!loading && products.length === 0 && <p className="py-8 text-center text-stone-500">No products yet.</p>}
 
@@ -344,16 +415,24 @@ export default function ProductsAdmin() {
             <div className="min-w-40 flex-1">
               <p className="font-medium">{p.name}</p>
               <p className="text-stone-500">
-                {formatPKR(p.price)}{p.sale_price ? ` → ${formatPKR(p.sale_price)}` : ""} · {p.collection_slug || "no collection"}
+                {formatPKR(p.price)}
+                {p.sale_active && p.sale_percent ? ` → ${formatPKR(Math.round((Number(p.price) * (100 - p.sale_percent)) / 100))} (${p.sale_percent}% off)` : ""}
+                {" · "}{p.collection_slug || "no collection"}
               </p>
               <p className="text-xs">
                 {!p.is_visible && <span className="mr-2 rounded bg-stone-200 px-1.5">Hidden</span>}
                 {p.sold_out && <span className="mr-2 rounded bg-red-100 px-1.5 text-red-800">Sold out</span>}
-                {p.is_new && <span className="rounded bg-black px-1.5 text-white">New</span>}
+                {p.is_new && <span className="mr-2 rounded bg-black px-1.5 text-white">New</span>}
+                {p.sale_active && p.sale_percent && <span className="rounded bg-orange-100 px-1.5 text-orange-800">Sale {p.sale_percent}%</span>}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button onClick={() => openForm(p)} className="rounded border border-stone-300 px-3 py-1">Edit</button>
+              {p.sale_percent && (
+                <button onClick={() => quickToggle(p, "sale_active")} className="rounded border border-stone-300 px-3 py-1">
+                  {p.sale_active ? "Sale off" : "Sale on"}
+                </button>
+              )}
               <button onClick={() => quickToggle(p, "sold_out")} className="rounded border border-stone-300 px-3 py-1">
                 {p.sold_out ? "In stock" : "Sold out"}
               </button>

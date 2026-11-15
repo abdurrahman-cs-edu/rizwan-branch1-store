@@ -14,4 +14,55 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
 }
+
+/* Headings use Tenor Sans (one weight only, so no fake bold) */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+}
+
+/* Glowing sale tag (shown under the suit when a sale is on) */
+.sale-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 9999px;
+  padding: 0.18rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(110deg, #ff2d75 0%, #ff7a18 35%, #ffc107 55%, #ff2d75 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 0 8px rgba(255, 45, 117, 0.45);
+  animation: sale-shine 3.5s linear infinite, sale-glow 2s ease-in-out infinite;
+}
+@keyframes sale-shine {
+  from { background-position: 0% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes sale-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 45, 117, 0.35); }
+  50% { box-shadow: 0 0 16px rgba(255, 122, 24, 0.8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sale-tag { animation: none; }
+}
+
+/* Hide the scrollbar on the feedback strip (still scrolls) */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
