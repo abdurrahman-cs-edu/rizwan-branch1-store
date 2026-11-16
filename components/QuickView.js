@@ -106,9 +106,9 @@ function QuickViewModal({ product, open, onClose }) {
 
         {/* Photos */}
         <div className="flex shrink-0 flex-col bg-stone-100 sm:w-[44%]">
-          <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-auto sm:min-h-0 sm:flex-1">
+          <div className="relative h-[44svh] w-full overflow-hidden sm:h-auto sm:min-h-0 sm:flex-1">
             {images.length > 0 ? (
-              <img key={active} src={images[active]} alt={product.name} className="fade-in absolute inset-0 h-full w-full object-cover" />
+              <img key={active} src={images[active]} alt={product.name} className="fade-in absolute inset-0 h-full w-full object-contain sm:object-cover" />
             ) : (
               <div className="flex h-full w-full items-center justify-center p-6 text-center text-stone-400">{product.name}</div>
             )}
