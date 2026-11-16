@@ -98,13 +98,10 @@ a:focus-visible > .slide-underline,
   }
 }
 
-/* Prices and other numbers: same style as the English words in the logo.
-   Slightly smaller because this font is wide. One weight only, so no fake bold. */
+/* Prices and other numbers: the same font as the prices on logoofficial.com (Outfit).
+   The weight comes from the text around it (the suit cards use a light weight, like logoofficial). */
 .num {
-  font-family: var(--font-logo), var(--font-display), Georgia, serif;
-  font-weight: 400;
-  font-size: 0.82em;
-  letter-spacing: 0.02em;
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   white-space: nowrap; /* "Rs. 23,200" never breaks into two lines */
 }
 

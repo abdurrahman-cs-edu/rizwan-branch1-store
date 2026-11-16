@@ -75,11 +75,11 @@ export default function ProductCard({ p, index = 0 }) {
         <p className="line-clamp-2 font-display text-[12px] uppercase leading-snug tracking-[0.14em] transition-opacity duration-300 group-hover:opacity-60 sm:text-[14px] sm:tracking-[0.2em]">
           {p.name}
         </p>
-        <p className="mt-1 text-[13px]">
+        <p className="mt-1 text-[13px] font-light sm:text-[13.6px]">
           {onSale ? (
             <>
               <span className="mr-2 text-stone-400 line-through"><Price value={p.price} /></span>
-              <span className="font-semibold text-red-600"><Price value={effectivePrice(p)} /></span>
+              <span className="font-normal text-red-600"><Price value={effectivePrice(p)} /></span>
             </>
           ) : (
             <span className="text-stone-700"><Price value={p.price} /></span>
