@@ -8,11 +8,13 @@ import SectionsAdmin from "@/components/admin/SectionsAdmin";
 import SizeChartAdmin from "@/components/admin/SizeChartAdmin";
 import ReviewsAdmin from "@/components/admin/ReviewsAdmin";
 import HeroSlidesAdmin from "@/components/admin/HeroSlidesAdmin";
+import AnnouncementsAdmin from "@/components/admin/AnnouncementsAdmin";
 
 const TABS = [
   ["orders", "Orders"],
   ["products", "Products"],
   ["home", "Home & Collections"],
+  ["alerts", "Announcements"],
   ["reviews", "Feedback"],
   ["sizes", "Size Chart"],
 ];
@@ -133,6 +135,7 @@ export default function AdminPage() {
           <SectionsAdmin />
         </>
       )}
+      {tab === "alerts" && <AnnouncementsAdmin />}
       {tab === "reviews" && <ReviewsAdmin />}
       {tab === "sizes" && <SizeChartAdmin />}
     </div>
