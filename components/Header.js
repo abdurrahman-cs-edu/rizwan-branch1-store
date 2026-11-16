@@ -59,10 +59,12 @@ const MenuIcon = ({ open, ...props }) => (
 //
 // On the home page the header sits on top of the big photo: transparent, with white writing and a white logo.
 // Once the page is scrolled (and on every other page) it is a white bar with the dark logo.
+// The home page is recognised by its photo (data-home-hero), in CSS (see globals.css, ".site-header").
+// It is NOT recognised by the address, because the server does not always know the address when it
+// rebuilds a page, and then the first screen came out wrong.
 export default function Header({ menu = MENU }) {
   const { count, openDrawer } = useCart();
-  const pathname = usePathname();
-  const onHome = pathname === "/";
+  const pathname = usePathname(); // only used to run the effects below again on every new page
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState(null); // which phone-menu item is expanded
@@ -72,7 +74,7 @@ export default function Header({ menu = MENU }) {
   // (Different limits for going down and coming back, so the header does not flicker.
   // Only other pages need a wide gap: there the header takes space, so a size change moves the page.)
   useEffect(() => {
-    const down = onHome ? 60 : 120;
+    const down = document.querySelector("[data-home-hero]") ? 60 : 120;
     function onScroll() {
       const y = window.scrollY;
       setScrolled((s) => (s ? y > 20 : y > down));
@@ -80,7 +82,7 @@ export default function Header({ menu = MENU }) {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [onHome]);
+  }, [pathname]);
 
   // A new page closes the phone menu and the search row.
   useEffect(() => {
@@ -88,25 +90,19 @@ export default function Header({ menu = MENU }) {
     setSearchOpen(false);
   }, [pathname]);
 
-  // "clear" = transparent header with white writing, on top of the home page photo
-  const clear = onHome && !scrolled && !menuOpen && !searchOpen;
-  const hoverBg = clear ? "hover:bg-white/15" : "hover:bg-stone-100";
+  // "clear" = at the top of the page with nothing open. On the home page that means: transparent, white writing.
+  const clear = !scrolled && !menuOpen && !searchOpen;
 
   return (
-    // On the home page the header takes no space (h-0), so the photo starts right under the top bar.
-    <header className={`sticky top-0 z-30 ${onHome ? "h-0" : ""}`}>
-      <div
-        className={`transition-colors duration-300 ${
-          clear ? "border-b border-transparent bg-transparent text-white" : "border-b border-stone-200 bg-white/95 text-[#111] backdrop-blur"
-        }`}
-      >
+    <header className="site-header sticky top-0 z-30" data-clear={clear}>
+      <div className="site-bar border-b border-stone-200 bg-white/95 text-[#111] backdrop-blur transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-2">
             {/* Left: menu button (phones, tablets) and search */}
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                className={`-ml-2 rounded-full p-1.5 xl:hidden ${hoverBg}`}
+                className="site-btn -ml-2 rounded-full p-1.5 hover:bg-stone-100 xl:hidden"
                 aria-label={menuOpen ? "Close menu" : "Open menu"}
                 onClick={() => setMenuOpen((v) => !v)}
               >
@@ -119,22 +115,14 @@ export default function Header({ menu = MENU }) {
                   name="q"
                   placeholder="Search suits"
                   aria-label="Search suits"
-                  className={`peer h-10 w-40 rounded-full border pl-9 pr-4 text-sm outline-none transition-all focus:w-52 xl:w-48 xl:focus:w-60 ${
-                    clear
-                      ? "border-white/60 bg-white/10 text-white placeholder:text-white/75 focus:border-white focus:bg-white focus:text-[#111] focus:placeholder:text-stone-400"
-                      : "border-stone-300 bg-stone-50 placeholder:text-stone-400 focus:border-[#111] focus:bg-white"
-                  }`}
+                  className="site-search peer h-10 w-40 rounded-full border border-stone-300 bg-stone-50 pl-9 pr-4 text-sm outline-none transition-all placeholder:text-stone-400 focus:w-52 focus:border-[#111] focus:bg-white xl:w-48 xl:focus:w-60"
                 />
-                <SearchIcon
-                  className={`pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 peer-focus:text-stone-500 ${
-                    clear ? "text-white/85" : "text-stone-500"
-                  }`}
-                />
+                <SearchIcon className="site-search-icon pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
               </form>
               {/* Search button (phones, tablets): opens the bar under the header */}
               <button
                 type="button"
-                className={`rounded-full p-1.5 lg:hidden ${hoverBg}`}
+                className="site-btn rounded-full p-1.5 hover:bg-stone-100 lg:hidden"
                 aria-label="Search"
                 onClick={() => setSearchOpen((v) => !v)}
               >
@@ -147,16 +135,12 @@ export default function Header({ menu = MENU }) {
               <img
                 src="/logo.svg"
                 alt={SITE.name}
-                className={`w-auto transition-[height,filter] duration-200 ${clear ? "brightness-0 invert" : ""} ${
+                className={`site-logo w-auto transition-[height,filter] duration-200 ${
                   scrolled ? "h-9 sm:h-11" : "h-11 sm:h-16 xl:h-20"
                 }`}
               />
               {!scrolled && (
-                <span
-                  className={`font-logo mt-0.5 text-[9px] uppercase tracking-[0.35em] sm:text-[10px] ${
-                    clear ? "text-white/90" : "text-stone-600"
-                  }`}
-                >
+                <span className="site-branch font-logo mt-0.5 text-[9px] uppercase tracking-[0.35em] text-stone-600 sm:text-[10px]">
                   {SITE.branch}
                 </span>
               )}
@@ -164,12 +148,12 @@ export default function Header({ menu = MENU }) {
 
             {/* Right: log in, cart */}
             <div className="flex items-center justify-end gap-1">
-              <Link href="/account" aria-label="Log in" title="Log in" className={`hidden rounded-full p-1.5 sm:inline-flex ${hoverBg}`}>
+              <Link href="/account" aria-label="Log in" title="Log in" className="site-btn hidden rounded-full p-1.5 hover:bg-stone-100 sm:inline-flex">
                 <UserIcon />
               </Link>
               <button
                 type="button"
-                className={`relative rounded-full p-1.5 ${hoverBg}`}
+                className="site-btn relative rounded-full p-1.5 hover:bg-stone-100"
                 aria-label={count > 0 ? `Open cart, ${count} items` : "Open cart"}
                 onClick={openDrawer}
               >

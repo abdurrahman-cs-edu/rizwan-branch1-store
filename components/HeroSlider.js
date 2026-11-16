@@ -45,6 +45,7 @@ export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
 
   return (
     <section
+      data-home-hero
       className="relative isolate h-[86svh] min-h-[460px] touch-pan-y overflow-hidden bg-stone-900 text-white sm:h-[92svh]"
       aria-roledescription="carousel"
       aria-label="Featured photos"

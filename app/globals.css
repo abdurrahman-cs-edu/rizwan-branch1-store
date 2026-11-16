@@ -39,6 +39,52 @@ h1 {
   font-weight: 400;
 }
 
+/* Home page header: lies on top of the big photo (the page that has the photo, data-home-hero).
+   At the top it is transparent with white writing and a white logo; after scrolling (data-clear="false")
+   or while a menu is open it is the normal white bar. Plain CSS, so the first screen is right even
+   when the page is rebuilt on the server. */
+body:has([data-home-hero]) .site-header {
+  height: 0; /* takes no space, so the photo starts right under the top bar */
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-bar {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  color: #fff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-logo {
+  filter: brightness(0) invert(1); /* the logo file is dark; this makes it white */
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-branch {
+  color: rgba(255, 255, 255, 0.9);
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-search {
+  border-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-search::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus {
+  border-color: #fff;
+  background-color: #fff;
+  color: #111;
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus::placeholder {
+  color: #a8a29e;
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-search-icon {
+  color: rgba(255, 255, 255, 0.85);
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus ~ .site-search-icon {
+  color: #78716c;
+}
+
 /* Prices and other numbers: same style as the English words in the logo.
    Slightly smaller because this font is wide. One weight only, so no fake bold. */
 .num {
