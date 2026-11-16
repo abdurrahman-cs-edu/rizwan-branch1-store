@@ -24,7 +24,7 @@ export default function ReviewsStrip({ title = "Customer feedback", reviews = []
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
-      <h2 className="mb-1 text-center text-xl uppercase tracking-[0.12em] sm:text-2xl">{title}</h2>
+      <h2 className="font-logo mb-1 text-center text-base uppercase tracking-[0.14em] sm:text-xl">{title}</h2>
       <p className="mb-5 text-center text-xs text-stone-500">Messages from our happy customers. Tap to enlarge.</p>
 
       <div className="no-scrollbar flex snap-x gap-3 overflow-x-auto pb-2">

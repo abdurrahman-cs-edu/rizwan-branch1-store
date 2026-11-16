@@ -32,6 +32,7 @@ export default async function Home() {
     products.find((p) => p.images?.[0])?.images[0] ||
     null;
   const coverDark = cover?.dark ?? 0.55;
+  const coverPos = `${cover?.x ?? 50}% ${cover?.y ?? 30}%`;
   // The "On sale" shortcut and filter only appear while at least one suit is on sale.
   const saleOn = products.some((p) => isOnSale(p) && !p.sold_out);
 
@@ -78,7 +79,8 @@ export default async function Home() {
             src={coverUrl}
             alt=""
             fetchPriority="high"
-            className="absolute inset-0 -z-20 h-full w-full object-cover object-[center_30%]"
+            className="absolute inset-0 -z-20 h-full w-full object-cover"
+            style={{ objectPosition: coverPos }}
           />
         )}
         {/* Dark layer so the writing is easy to read on any photo */}

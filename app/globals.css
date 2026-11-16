@@ -33,6 +33,11 @@ h1 {
   font-family: var(--font-display), Georgia, serif;
   font-weight: 400;
 }
+/* Same style as the English words in the logo (one weight only) */
+.font-logo {
+  font-family: var(--font-logo), var(--font-display), Georgia, serif;
+  font-weight: 400;
+}
 
 /* Glowing sale tag (shown under the suit when a sale is on) */
 .sale-tag {
