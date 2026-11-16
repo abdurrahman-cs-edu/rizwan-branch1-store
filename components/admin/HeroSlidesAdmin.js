@@ -24,6 +24,7 @@ const withId = (s) => ({ id: nextId++, url: s.url, x: pct(s.x, 50), y: pct(s.y, 
 export default function HeroSlidesAdmin() {
   const [slides, setSlides] = useState([]);
   const [dark, setDark] = useState(30); // percent
+  const [seconds, setSeconds] = useState(3); // how long each photo stays
   const [sel, setSel] = useState(0);
   const [ratio, setRatio] = useState(1.5); // width / height of the selected photo
   const [collections, setCollections] = useState([]);
@@ -46,6 +47,8 @@ export default function HeroSlidesAdmin() {
       setSlides(v.slides.filter((s) => s?.url).map(withId));
       const d = Math.round(Number(v.dark) * 100);
       setDark(d >= 10 && d <= 85 ? d : 30);
+      const sec = Number(v.seconds);
+      setSeconds(sec >= 2 && sec <= 8 ? sec : 3);
     } else {
       // Nothing saved yet: start from the old single cover photo, if there is one.
       const { data: old } = await supabase.from("site_settings").select("value").eq("key", OLD_KEY).maybeSingle();
@@ -65,13 +68,14 @@ export default function HeroSlidesAdmin() {
 
   const current = slides[sel] || null;
 
-  async function persist(nextSlides, nextDark) {
+  async function persist(nextSlides, nextDark, nextSeconds = seconds) {
     const { error } = await supabase.from("site_settings").upsert(
       {
         key: KEY,
         value: {
           slides: nextSlides.map(({ url, x, y, title, link }) => ({ url, x, y, title: title.trim(), link })),
           dark: nextDark / 100,
+          seconds: nextSeconds,
         },
         updated_at: new Date().toISOString(),
       },
@@ -183,7 +187,7 @@ export default function HeroSlidesAdmin() {
       <h2 className="text-lg">Home page slideshow</h2>
       <p className="text-xs text-stone-600">
         The big photos at the top of the home page. They change by themselves every few seconds. Add 3 to 6 wide photos (a model or the
-        shop). The menu and logo sit on top of the photo, so keep the top part of each photo simple. If you add nothing, the photos of
+        shop). A photo of 2 to 3 MB is fine: it is made smaller (about 1920 px wide, a few hundred KB) automatically before it is saved. The menu and logo sit on top of the photo, so keep the top part of each photo simple. If you add nothing, the photos of
         your first suits are shown.
       </p>
 
@@ -324,6 +328,26 @@ export default function HeroSlidesAdmin() {
               </div>
             </div>
           )}
+
+          <label className="block text-sm">
+            Change to the next photo every
+            <select
+              value={seconds}
+              onChange={(e) => {
+                setSeconds(Number(e.target.value));
+                setDirty(true);
+                setMessage("");
+              }}
+              className="mx-2 rounded border border-stone-300 px-2 py-1"
+            >
+              {[2, 3, 4, 5, 6, 8].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+            seconds
+          </label>
 
           <label className="block text-sm">
             Darkness over the photos: {dark}%

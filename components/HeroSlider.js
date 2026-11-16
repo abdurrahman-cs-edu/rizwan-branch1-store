@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
-const INTERVAL = 5500; // milliseconds each photo stays
-
 // Full-screen photo slideshow at the top of the home page.
 // The header sits on top of it (see Header.js). Photos fade into each other,
 // change by themselves, and can be swiped on a phone or changed with the dots / arrows.
-export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
+export default function HeroSlider({ slides, dark = 0.3, seconds = 3, siteName, tagline }) {
   // siteName and tagline are only for search engines and screen readers (hidden heading); nothing is written on the photos unless the admin adds a heading.
   const n = slides.length;
   const [i, setI] = useState(0);
@@ -30,9 +28,9 @@ export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
   // Next photo after a few seconds. Changing by hand restarts the timer.
   useEffect(() => {
     if (n < 2 || paused || reduced) return;
-    const t = setTimeout(() => setI((x) => (x + 1) % n), INTERVAL);
+    const t = setTimeout(() => setI((x) => (x + 1) % n), seconds * 1000);
     return () => clearTimeout(t);
-  }, [i, n, paused, reduced]);
+  }, [i, n, paused, reduced, seconds]);
 
   function onTouchStart(e) {
     touchX.current = e.touches[0].clientX;
@@ -65,7 +63,7 @@ export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
         <div
           key={s.url + k}
           aria-hidden={k !== i}
-          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
             k === i ? "opacity-100" : "pointer-events-none opacity-0"
           }`}
         >

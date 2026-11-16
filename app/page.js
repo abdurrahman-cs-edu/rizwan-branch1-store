@@ -32,6 +32,7 @@ export default async function Home() {
   // the old single cover photo (if any) is followed by the photos of a few suits, so the page already moves.
   let slides = slideshow?.slides || [];
   let heroDark = slideshow?.dark ?? 0.3;
+  const heroSeconds = slideshow?.seconds ?? 3;
   if (!slideshow) {
     const suitPhotos = products
       .filter((p) => !p.sold_out && p.images?.[0])
@@ -85,7 +86,7 @@ export default async function Home() {
       <DemoNotice show={isDemo} />
 
       {slides.length > 0 ? (
-        <HeroSlider slides={slides} dark={heroDark} siteName={SITE.name} tagline={SITE.tagline} />
+        <HeroSlider slides={slides} dark={heroDark} seconds={heroSeconds} siteName={SITE.name} tagline={SITE.tagline} />
       ) : (
         <section data-home-hero className="relative flex h-[86svh] min-h-[460px] flex-col items-center justify-end bg-stone-900 px-6 pb-16 text-center text-white sm:h-[92svh]">
           <h1 className="sr-only">
