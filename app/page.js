@@ -88,7 +88,7 @@ export default async function Home() {
       {slides.length > 0 ? (
         <HeroSlider slides={slides} dark={heroDark} seconds={heroSeconds} siteName={SITE.name} tagline={SITE.tagline} />
       ) : (
-        <section data-home-hero className="relative flex h-[86svh] min-h-[460px] flex-col items-center justify-end bg-stone-900 px-6 pb-16 text-center text-white sm:h-[92svh]">
+        <section data-home-hero className="relative flex h-[calc(100svh-var(--ann-h))] min-h-[460px] flex-col items-center justify-end bg-stone-900 px-6 pb-16 text-center text-white">
           <h1 className="sr-only">
             {SITE.name}: {SITE.tagline}
           </h1>

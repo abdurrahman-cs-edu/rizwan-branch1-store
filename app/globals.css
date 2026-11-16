@@ -11,6 +11,17 @@
   --accent-soft: #f2f6ff;
 }
 
+/* Height of the top bar; the real value is measured by AnnouncementBar. These are first guesses
+   (two lines on a phone, one line on bigger screens) used until then. */
+:root {
+  --ann-h: 3rem;
+}
+@media (min-width: 640px) {
+  :root {
+    --ann-h: 2.25rem;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
