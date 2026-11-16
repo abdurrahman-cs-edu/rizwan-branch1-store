@@ -1,4 +1,5 @@
 import { getCatalogue } from "@/lib/catalogue";
+import { productCollectionSlugs } from "@/lib/products";
 import CollectionView from "@/components/CollectionView";
 
 export const metadata = { title: "Search", robots: { index: false } };
@@ -11,7 +12,7 @@ export default async function SearchPage({ searchParams }) {
   const words = q.toLowerCase().split(/\s+/).filter(Boolean);
   const results = words.length
     ? products.filter((p) => {
-        const hay = `${p.name} ${p.fabric || ""} ${p.collection_slug || ""}`.toLowerCase();
+        const hay = `${p.name} ${p.fabric || ""} ${productCollectionSlugs(p).join(" ")}`.toLowerCase();
         return words.every((w) => hay.includes(w));
       })
     : [];

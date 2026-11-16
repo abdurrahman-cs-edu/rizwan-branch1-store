@@ -37,14 +37,22 @@ const BagIcon = (props) => (
   </Icon>
 );
 
+const ChevronIcon = (props) => (
+  <Icon {...props}>
+    <path d="m6 9 6 6 6-6" />
+  </Icon>
+);
+
 const MenuIcon = ({ open, ...props }) => (
   <Icon {...props}>{open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}</Icon>
 );
 
-export default function Header() {
+// menu = [{ label, href, children: [{ label, href }] }], built from the collections in the admin panel.
+export default function Header({ menu = MENU }) {
   const { count, openDrawer } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [openGroup, setOpenGroup] = useState(null); // which phone-menu item is expanded
   const [scrolled, setScrolled] = useState(false);
 
   // The big logo shrinks a little once the page is scrolled, so it does not cover the suits.
@@ -73,18 +81,41 @@ export default function Header() {
             <MenuIcon open={menuOpen} />
           </button>
           <nav className="hidden gap-7 text-[13px] uppercase tracking-[0.18em] xl:flex">
-            {MENU.map((m) => (
-              <Link key={m.href} href={m.href} className="hover:underline">
-                {m.label}
-              </Link>
-            ))}
+            {menu.map((m) =>
+              m.children?.length ? (
+                // Opens when the mouse is over it or when it is reached with the keyboard
+                <div key={m.href} className="group relative -my-3 py-3">
+                  <Link href={m.href} className="flex items-center gap-1 hover:underline">
+                    {m.label}
+                    <ChevronIcon className="h-3 w-3 transition-transform group-hover:rotate-180" />
+                  </Link>
+                  <div className="invisible absolute left-0 top-full z-40 min-w-60 border border-stone-200 bg-white py-2 opacity-0 shadow-lg transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                    {m.children.map((c) => (
+                      <Link key={c.href} href={c.href} className="block px-5 py-2 text-[12px] tracking-[0.12em] hover:bg-stone-50 hover:underline">
+                        {c.label}
+                      </Link>
+                    ))}
+                    <Link
+                      href={m.href}
+                      className="mt-1 block border-t border-stone-200 px-5 py-2 text-[12px] font-bold tracking-[0.2em] hover:bg-stone-50"
+                    >
+                      View all
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <Link key={m.href} href={m.href} className="hover:underline">
+                  {m.label}
+                </Link>
+              )
+            )}
           </nav>
         </div>
 
         {/* Centre: logo with the branch name under it */}
         <Link href="/" className="flex flex-col items-center" aria-label={`${SITE.name} home`}>
           <img
-            src="/logo.png"
+            src="/logo.svg"
             alt={SITE.name}
             className={`w-auto transition-[height] duration-200 ${
               scrolled ? "h-9 sm:h-11" : "h-[52px] sm:h-16 xl:h-20"
@@ -160,16 +191,47 @@ export default function Header() {
 
       {menuOpen && (
         <nav className="border-t border-stone-200 bg-white px-4 py-2 xl:hidden">
-          {MENU.map((m) => (
-            <Link
-              key={m.href}
-              href={m.href}
-              onClick={() => setMenuOpen(false)}
-              className="block py-2 text-sm"
-            >
-              {m.label}
-            </Link>
-          ))}
+          {menu.map((m) => {
+            const kids = m.children || [];
+            if (kids.length === 0) {
+              return (
+                <Link key={m.href} href={m.href} onClick={() => setMenuOpen(false)} className="block py-2 text-sm">
+                  {m.label}
+                </Link>
+              );
+            }
+            const open = openGroup === m.href;
+            return (
+              <div key={m.href}>
+                <div className="flex items-center justify-between">
+                  <Link href={m.href} onClick={() => setMenuOpen(false)} className="flex-1 py-2 text-sm">
+                    {m.label}
+                  </Link>
+                  <button
+                    type="button"
+                    aria-label={`${open ? "Hide" : "Show"} ${m.label} collections`}
+                    aria-expanded={open}
+                    className="p-2"
+                    onClick={() => setOpenGroup(open ? null : m.href)}
+                  >
+                    <ChevronIcon className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+                  </button>
+                </div>
+                {open && (
+                  <div className="mb-1 ml-3 border-l border-stone-200 pl-3">
+                    {kids.map((c) => (
+                      <Link key={c.href} href={c.href} onClick={() => setMenuOpen(false)} className="block py-1.5 text-sm text-stone-700">
+                        {c.label}
+                      </Link>
+                    ))}
+                    <Link href={m.href} onClick={() => setMenuOpen(false)} className="block py-1.5 text-sm font-medium underline">
+                      View all
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
           <Link href="/account" onClick={() => setMenuOpen(false)} className="block py-2 text-sm">
             Log in
           </Link>

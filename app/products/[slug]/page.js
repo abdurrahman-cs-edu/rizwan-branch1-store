@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getReviews, getSizeChart } from "@/lib/catalogue";
-import { effectivePrice, formatPKR, isOnSale } from "@/lib/products";
+import { effectivePrice, formatPKR, isOnSale, productCollectionSlugs } from "@/lib/products";
 import { SEASON_LABELS, SHIPPING_FEE, SITE, SIZES, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
 import ProductGallery from "@/components/ProductGallery";
 import ShareButton from "@/components/ShareButton";
@@ -60,15 +60,22 @@ export default async function ProductPage({ params }) {
     { label: "Trouser", value: product.trouser_fabric },
   ].filter((part) => part.value);
 
+  // Every season the suit is ticked for (Summer, Winter, Tropical weather)
+  const myCollections = productCollectionSlugs(product);
+  const seasonText = Object.keys(SEASON_LABELS)
+    .filter((s) => myCollections.includes(s) || product.season === s)
+    .map((s) => SEASON_LABELS[s])
+    .join(", ");
+
   const details = [
     { label: "Fabric", value: product.fabric },
     { label: "Colour", value: product.color },
-    { label: "Season", value: SEASON_LABELS[product.season] || "" },
+    { label: "Season", value: seasonText },
     { label: "Sizes", value: SIZES.join(", ") },
   ].filter((d) => d.value);
 
   const related = products
-    .filter((p) => p.slug !== product.slug && p.collection_slug === product.collection_slug)
+    .filter((p) => p.slug !== product.slug && productCollectionSlugs(p).some((s) => myCollections.includes(s)))
     .slice(0, 4);
 
   const jsonLd = {

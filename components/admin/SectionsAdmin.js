@@ -16,7 +16,7 @@ export default function SectionsAdmin() {
   const [collections, setCollections] = useState([]);
   const [message, setMessage] = useState("");
   const [newSection, setNewSection] = useState({ title: "", kind: "collection", collection_slug: "" });
-  const [newCollection, setNewCollection] = useState({ name: "", parent_slug: "" });
+  const [newCollection, setNewCollection] = useState({ name: "", parent_slug: "", in_menu: true });
 
   const load = useCallback(async () => {
     const [s, c] = await Promise.all([
@@ -90,10 +90,11 @@ export default function SectionsAdmin() {
       slug,
       name: newCollection.name.trim(),
       parent_slug: newCollection.parent_slug || null,
+      in_menu: !newCollection.parent_slug && newCollection.in_menu,
       sort_order: collections.length + 1,
     });
     if (error) return setMessage(error.code === "23505" ? "A collection with this name already exists." : "Could not add the collection.");
-    setNewCollection({ name: "", parent_slug: "" });
+    setNewCollection({ name: "", parent_slug: "", in_menu: true });
     setMessage("");
     load();
   }
@@ -166,8 +167,24 @@ export default function SectionsAdmin() {
                   onBlur={(e) => e.target.value.trim() && e.target.value.trim() !== c.name && patch("collections", "slug", c.slug, { name: e.target.value.trim() })}
                   className={input + " w-full"}
                 />
-                <p className="mt-1 text-xs text-stone-500">{c.parent_slug ? `Inside: ${c.parent_slug}` : "Main collection"}</p>
+                <select
+                  value={c.parent_slug || ""}
+                  disabled={collections.some((x) => x.parent_slug === c.slug)}
+                  title={collections.some((x) => x.parent_slug === c.slug) ? "This collection has others inside it, so it stays a main collection" : undefined}
+                  onChange={(e) => patch("collections", "slug", c.slug, { parent_slug: e.target.value || null, in_menu: e.target.value ? false : c.in_menu })}
+                  className={input + " mt-1 w-full text-xs"}
+                >
+                  <option value="">Main collection</option>
+                  {collections.filter((x) => !x.parent_slug && x.slug !== c.slug).map((x) => (
+                    <option key={x.slug} value={x.slug}>Inside {x.name}</option>
+                  ))}
+                </select>
               </div>
+              {!c.parent_slug && (
+                <label className="flex items-center gap-1" title="Show this collection in the top menu, with the collections inside it as a dropdown">
+                  <input type="checkbox" checked={!!c.in_menu} onChange={(e) => patch("collections", "slug", c.slug, { in_menu: e.target.checked })} /> In menu
+                </label>
+              )}
               <label className="flex items-center gap-1">
                 <input type="checkbox" checked={c.is_visible} onChange={(e) => patch("collections", "slug", c.slug, { is_visible: e.target.checked })} /> Show
               </label>
@@ -184,6 +201,15 @@ export default function SectionsAdmin() {
               <option key={c.slug} value={c.slug}>Inside {c.name}</option>
             ))}
           </select>
+          {!newCollection.parent_slug && (
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={newCollection.in_menu} onChange={(e) => setNewCollection({ ...newCollection, in_menu: e.target.checked })} />
+              Show in the top menu (for example Summer, Winter, Tropical weather)
+            </label>
+          )}
+          <p className="text-xs text-stone-600">
+            In the menu, a main collection gets a dropdown with the collections inside it and a “View all” link.
+          </p>
           <button className="rounded bg-[var(--brand)] px-4 py-1.5 text-[var(--brand-contrast)]">Add collection</button>
         </form>
       </section>

@@ -1,12 +1,16 @@
 import "./globals.css";
 import { bodyFont, displayFont, logoFont } from "@/lib/fonts";
 import { SITE } from "@/lib/config";
+import { buildMenu, getCollections } from "@/lib/catalogue";
 import { CartProvider } from "@/components/CartProvider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+
+// The menu comes from the collections in the admin panel; a change shows within a minute.
+export const revalidate = 60;
 
 export const metadata = {
   metadataBase: new URL(SITE.url),
@@ -28,13 +32,15 @@ export const viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const menu = buildMenu(await getCollections());
+
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable} ${logoFont.variable}`}>
       <body className="flex min-h-screen flex-col">
         <CartProvider>
           <AnnouncementBar />
-          <Header />
+          <Header menu={menu} />
           <div className="flex-1">{children}</div>
           <Footer />
           <CartDrawer />

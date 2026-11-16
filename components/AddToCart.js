@@ -50,6 +50,8 @@ export default function AddToCart({ product }) {
 
   function onAdd() {
     add(item());
+    // Back to 1, so choosing another size afterwards cannot add the same big quantity again by mistake.
+    setQty(1);
   }
 
   // Buy it now: put the suit in the cart and go straight to checkout.

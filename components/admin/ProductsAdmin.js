@@ -12,7 +12,6 @@ const EMPTY = {
   slug: "",
   fabric: "",
   color: "",
-  season: "",
   shirt_fabric: "",
   dupatta_fabric: "",
   trouser_fabric: "",
@@ -20,7 +19,7 @@ const EMPTY = {
   sale_percent: "",
   sale_active: false,
   stock: { S: "", M: "", L: "", XL: "", XXL: "" },
-  collection_slug: "",
+  collection_slugs: [], // every collection / season the suit shows in
   includes: "Shirt, Dupatta, Trouser",
   description: "",
   is_new: false,
@@ -51,7 +50,7 @@ export default function ProductsAdmin() {
     setLoading(true);
     const [p, c] = await Promise.all([
       supabase.from("products").select("*").order("id", { ascending: false }),
-      supabase.from("collections").select("slug,name,parent_slug").order("sort_order"),
+      supabase.from("collections").select("slug,name,parent_slug,is_visible").order("sort_order"),
     ]);
     if (p.error) setMessage("Could not load products.");
     else setProducts(p.data || []);
@@ -78,10 +77,12 @@ export default function ProductsAdmin() {
         stock: Object.fromEntries(
           SIZES.map((s) => [s, product.stock && product.stock[s] != null ? String(product.stock[s]) : ""])
         ),
-        collection_slug: product.collection_slug || "",
+        collection_slugs:
+          Array.isArray(product.collection_slugs) && product.collection_slugs.length > 0
+            ? product.collection_slugs
+            : [product.collection_slug, product.season].filter(Boolean),
         fabric: product.fabric || "",
         color: product.color || "",
-        season: product.season || "",
         shirt_fabric: product.shirt_fabric || "",
         dupatta_fabric: product.dupatta_fabric || "",
         trouser_fabric: product.trouser_fabric || "",
@@ -104,6 +105,23 @@ export default function ProductsAdmin() {
       const next = { ...f, [field]: value };
       if (field === "name" && !slugTouched) next.slug = slugify(value);
       return next;
+    });
+  }
+
+  // Tick / untick a collection. Ticking one inside Summer also ticks Summer;
+  // unticking Summer also unticks the ones inside it.
+  function toggleCollection(slug) {
+    setForm((f) => {
+      const set = new Set(f.collection_slugs);
+      const c = collections.find((x) => x.slug === slug);
+      if (set.has(slug)) {
+        set.delete(slug);
+        collections.filter((x) => x.parent_slug === slug).forEach((x) => set.delete(x.slug));
+      } else {
+        set.add(slug);
+        if (c?.parent_slug) set.add(c.parent_slug);
+      }
+      return { ...f, collection_slugs: [...set] };
     });
   }
 
@@ -161,12 +179,21 @@ export default function ProductsAdmin() {
       ? Object.fromEntries(SIZES.map((s) => [s, Math.min(9999, parseInt(form.stock[s], 10) || 0)]))
       : null;
 
+    // The old single columns are kept in step for older code: "season" = first ticked season,
+    // "collection_slug" = the most specific ticked collection.
+    const chosen = form.collection_slugs;
+    const seasonValues = SEASONS.map((x) => x.value);
+    const parentOf = (slug) => collections.find((x) => x.slug === slug)?.parent_slug;
+    const season = chosen.find((x) => seasonValues.includes(x)) || null;
+    const mainCollection =
+      chosen.find((x) => parentOf(x)) || chosen.find((x) => !seasonValues.includes(x)) || chosen[0] || null;
+
     const payload = {
       name: form.name.trim(),
       slug: form.slug,
       fabric: form.fabric.trim() || null,
       color: form.color.trim() || null,
-      season: form.season || null,
+      season,
       shirt_fabric: form.shirt_fabric.trim() || null,
       dupatta_fabric: form.dupatta_fabric.trim() || null,
       trouser_fabric: form.trouser_fabric.trim() || null,
@@ -174,7 +201,8 @@ export default function ProductsAdmin() {
       sale_percent: salePct,
       sale_active: form.sale_active && salePct !== null,
       stock,
-      collection_slug: form.collection_slug || null,
+      collection_slug: mainCollection,
+      collection_slugs: chosen,
       includes: form.includes.trim() || "Shirt, Dupatta, Trouser",
       description: form.description.trim() || null,
       is_new: form.is_new,
@@ -286,32 +314,34 @@ export default function ProductsAdmin() {
             <input className={input} value={form.fabric} onChange={(e) => setField("fabric", e.target.value)} />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium">Collection</label>
-            <select className={input} value={form.collection_slug} onChange={(e) => setField("collection_slug", e.target.value)}>
-              <option value="">None</option>
-              {collections.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.parent_slug ? "— " : ""}{c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div>
             <label className="mb-1 block text-sm font-medium">Colour</label>
             <input className={input} value={form.color} onChange={(e) => setField("color", e.target.value)} />
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Season</label>
-            <select className={input} value={form.season} onChange={(e) => setField("season", e.target.value)}>
-              <option value="">Not set</option>
-              {SEASONS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
+        </div>
+
+        <div>
+          <p className="mb-1 text-sm font-medium">Show this suit in (tick all that apply)</p>
+          <div className="space-y-2 rounded border border-stone-200 p-3 text-sm">
+            {collections.filter((c) => !c.parent_slug).map((parent) => (
+              <div key={parent.slug}>
+                <label className="flex items-center gap-2 font-medium">
+                  <input type="checkbox" checked={form.collection_slugs.includes(parent.slug)} onChange={() => toggleCollection(parent.slug)} />
+                  {parent.name}
+                  {!parent.is_visible && <span className="text-xs font-normal text-stone-500">(hidden)</span>}
+                </label>
+                {collections.filter((c) => c.parent_slug === parent.slug).map((c) => (
+                  <label key={c.slug} className="ml-6 mt-1 flex items-center gap-2">
+                    <input type="checkbox" checked={form.collection_slugs.includes(c.slug)} onChange={() => toggleCollection(c.slug)} />
+                    {c.name}
+                    {!c.is_visible && <span className="text-xs text-stone-500">(hidden)</span>}
+                  </label>
+                ))}
+              </div>
+            ))}
           </div>
+          <p className="mt-1 text-xs text-stone-600">
+            Tick Summer, Winter and/or Tropical weather to show the suit in each of them. A suit ticked inside a season (indented) also shows in that season.
+          </p>
         </div>
 
         <div>
@@ -451,7 +481,10 @@ export default function ProductsAdmin() {
               <p className="text-stone-500">
                 {formatPKR(p.price)}
                 {p.sale_active && p.sale_percent ? ` → ${formatPKR(Math.round((Number(p.price) * (100 - p.sale_percent)) / 100))} (${p.sale_percent}% off)` : ""}
-                {" · "}{p.collection_slug || "no collection"}
+                {" · "}
+                {(Array.isArray(p.collection_slugs) && p.collection_slugs.length > 0 ? p.collection_slugs : [p.collection_slug].filter(Boolean))
+                  .map((slug) => collections.find((c) => c.slug === slug)?.name || slug)
+                  .join(", ") || "no collection"}
               </p>
               {p.stock && (
                 <p className="text-xs text-stone-600">
