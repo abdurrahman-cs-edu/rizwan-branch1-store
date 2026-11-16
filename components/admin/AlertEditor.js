@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AlertBar from "@/components/AlertBar";
 import {
   COLOR_PRESETS,
@@ -55,6 +55,21 @@ function Check({ checked, onChange, children }) {
 // "pages" are the shop pages that can be picked as a link: [{ label, href }].
 export default function AlertEditor({ alert, onChange, pages = [] }) {
   const [view, setView] = useState("laptop");
+  // The website header sticks to the top while scrolling; the preview sticks right under it
+  const [top, setTop] = useState(0);
+  useEffect(() => {
+    const update = () => {
+      const h = document.querySelector("header.site-header");
+      setTop(h ? Math.round(h.getBoundingClientRect().height) : 0);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
   const set = (patch) => onChange({ ...alert, ...patch });
 
   const setMessage = (i, patch) => set({ messages: alert.messages.map((m, idx) => (idx === i ? { ...m, ...patch } : m)) });
@@ -69,7 +84,7 @@ export default function AlertEditor({ alert, onChange, pages = [] }) {
   return (
     <div className="space-y-5">
       {/* Preview */}
-      <div className="sticky top-0 z-10 -mx-3 bg-white px-3 pb-3 pt-1 shadow-[0_6px_8px_-6px_rgba(0,0,0,0.15)]">
+      <div className="sticky z-20 -mx-3 bg-white px-3 pb-3 pt-1 shadow-[0_6px_8px_-6px_rgba(0,0,0,0.15)]" style={{ top }}>
         <div className="mb-1.5 flex items-center justify-between">
           <p className={heading + " mb-0"}>Preview (how customers will see it)</p>
           <div className="flex gap-1 text-xs">

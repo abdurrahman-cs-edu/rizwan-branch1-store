@@ -218,8 +218,9 @@ export default function AlertBar({ alert, onClose, preview = false }) {
         "--ann-dur": `${dur}s`,
       }}
     >
-      <div className={`flex items-center justify-center gap-x-3 gap-y-1 ${ticker ? "" : "flex-wrap"} ${alert.closable ? "px-9" : "px-4"}`}>
-        <div className={ticker ? "min-w-0 flex-1" : "min-w-0 text-center"}>{body}</div>
+      <div className={`flex flex-wrap items-center justify-center gap-x-3 gap-y-1 ${alert.closable ? "px-9" : "px-4"}`}>
+        {/* On a phone a ticker takes the whole row, so the countdown sits under it instead of squeezing it */}
+        <div className={ticker ? "min-w-0 basis-full sm:flex-1 sm:basis-0" : "min-w-0 text-center"}>{body}</div>
         {alert.countdownOn && alert.countdownEnd && (
           <div className="shrink-0">
             <Countdown end={alert.countdownEnd} label={alert.countdownLabel} />
