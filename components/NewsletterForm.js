@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { MailIcon } from "@/components/Icons";
 
+// E-mail box with a line under it and an envelope button (like logoofficial.com).
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
   const [state, setState] = useState("idle"); // idle | saving | done | error
@@ -30,26 +32,32 @@ export default function NewsletterForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex max-w-sm gap-2">
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Your email"
-        className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900"
-        aria-label="Email address"
-      />
-      <button
-        disabled={state === "saving"}
-        className="rounded bg-[var(--brand)] px-4 py-2 text-sm text-[var(--brand-contrast)] disabled:opacity-60"
-      >
-        Subscribe
-      </button>
+    <form onSubmit={onSubmit} className="max-w-[270px]">
+      <div className="flex items-center border-b-2 border-black">
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (state === "error") setState("idle");
+          }}
+          placeholder="Enter your email"
+          className="h-10 w-full bg-transparent text-[13.6px] text-black outline-none placeholder:text-black/70"
+          aria-label="Email address"
+        />
+        <button
+          disabled={state === "saving"}
+          aria-label="Subscribe"
+          className="press shrink-0 p-1 transition-opacity hover:opacity-60 disabled:opacity-40"
+        >
+          <MailIcon />
+        </button>
+      </div>
       <span className="sr-only" role="status">
         {state === "done" ? "Subscribed" : ""}
       </span>
-      {state === "done" && <span className="self-center text-xs text-green-700">Thank you!</span>}
-      {state === "error" && <span className="self-center text-xs text-red-600">Please try again.</span>}
+      {state === "done" && <p className="fade-in mt-2 text-xs text-green-700">Thank you! You are subscribed.</p>}
+      {state === "error" && <p className="fade-in mt-2 text-xs text-red-600">Please enter a valid email and try again.</p>}
     </form>
   );
 }
