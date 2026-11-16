@@ -92,6 +92,7 @@ body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus ~ 
   font-weight: 400;
   font-size: 0.82em;
   letter-spacing: 0.02em;
+  white-space: nowrap; /* "Rs. 23,200" never breaks into two lines */
 }
 
 /* Glowing sale tag (shown under the suit when a sale is on) */
