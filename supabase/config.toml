@@ -1,0 +1,5 @@
+# The website calls this function with the public (publishable) key, which is
+# not a login token, so the built-in JWT check is switched off. The function
+# does its own validation and rate limiting instead.
+[functions.create-web-order]
+verify_jwt = false

@@ -1,0 +1,317 @@
+@import "tailwindcss";
+
+/* Brand colours: placeholders until the design is decided */
+:root {
+  --brand: #1f2937;
+  --brand-contrast: #ffffff;
+  --background: #ffffff;
+  --foreground: #111827;
+  /* Checkout accent (same blue as rizwanclothing.com checkout) */
+  --accent: #005bd3;
+  --accent-soft: #f2f6ff;
+}
+
+/* Height of the top bar; the real value is measured by AnnouncementBar. These are first guesses
+   (two lines on a phone, one line on bigger screens) used until then. */
+:root {
+  --ann-h: 3rem;
+}
+@media (min-width: 640px) {
+  :root {
+    --ann-h: 2.25rem;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+/* Headings use Tenor Sans (one weight only, so no fake bold) */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+h1 {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+}
+/* Same style as the English words in the logo (one weight only) */
+.font-logo {
+  font-family: var(--font-logo), var(--font-display), Georgia, serif;
+  font-weight: 400;
+}
+
+/* Home page header: lies on top of the big photo (the page that has the photo, data-home-hero).
+   At the top it is transparent with white writing and a white logo; after scrolling (data-clear="false")
+   or while a menu is open it is the normal white bar. Plain CSS, so the first screen is right even
+   when the page is rebuilt on the server. */
+body:has([data-home-hero]) .site-header {
+  height: 0; /* takes no space, so the photo starts right under the top bar */
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-bar {
+  background-color: transparent;
+  border-bottom-color: transparent;
+  color: #fff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-logo {
+  filter: brightness(0) invert(1); /* the logo file is dark; this makes it white */
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-branch {
+  color: #fff;
+}
+body:has([data-home-hero]) .site-header[data-clear="true"] .site-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Menu links: a thin line slides in from the left when you point at the link, and leaves to the right.
+   (The position flips at once, only the width is animated.) */
+.slide-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.slide-underline:hover,
+.slide-underline:focus-visible,
+a:hover > .slide-underline,
+a:focus-visible > .slide-underline,
+.nav-item:hover > .slide-underline,
+.nav-item:focus-within > .slide-underline {
+  background-position: 0 100%;
+  background-size: 100% 1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide-underline {
+    transition: none;
+  }
+}
+
+/* Prices and other numbers: same style as the English words in the logo.
+   Slightly smaller because this font is wide. One weight only, so no fake bold. */
+.num {
+  font-family: var(--font-logo), var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
+  white-space: nowrap; /* "Rs. 23,200" never breaks into two lines */
+}
+
+/* Glowing sale tag (shown under the suit when a sale is on) */
+.sale-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 9999px;
+  padding: 0.18rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(110deg, #ff2d75 0%, #ff7a18 35%, #ffc107 55%, #ff2d75 100%);
+  background-size: 200% 100%;
+  box-shadow: 0 0 8px rgba(255, 45, 117, 0.45);
+  animation: sale-shine 3.5s linear infinite, sale-glow 2s ease-in-out infinite;
+}
+@keyframes sale-shine {
+  from { background-position: 0% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes sale-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(255, 45, 117, 0.35); }
+  50% { box-shadow: 0 0 16px rgba(255, 122, 24, 0.8); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sale-tag { animation: none; }
+}
+
+/* Hide the scrollbar on the feedback strip (still scrolls) */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+
+/* ------------------------------------------------------------------
+   Motion: smooth opening, closing, hovering and page changes.
+   Everything below stands still for people who turned animations off.
+   ------------------------------------------------------------------ */
+
+/* Every link and button changes colour smoothly, and shows a hand cursor.
+   (In the base layer, so a class like "transition-opacity duration-700" still wins.) */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+  a,
+  button {
+    transition-property: color, background-color, border-color, text-decoration-color, opacity, box-shadow;
+    transition-duration: 250ms;
+    transition-timing-function: ease;
+  }
+}
+
+/* A new page fades in and rises a little */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.page-in {
+  animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: fade-in 0.45s ease-out backwards;
+}
+
+/* A suit in the cart slides in */
+@keyframes cart-line-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: none; }
+}
+.cart-line-in {
+  animation: cart-line-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* A number that just changed (quantity, total) gives a small bump */
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.pop {
+  display: inline-block;
+  animation: pop 0.35s ease-out;
+}
+@keyframes badge-bump {
+  0% { transform: scale(0.4); }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.cart-badge {
+  animation: badge-bump 0.4s ease-out;
+}
+
+/* Buttons sink a little when pressed */
+.press {
+  transition: transform 0.15s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    opacity 0.3s ease, box-shadow 0.3s ease;
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Things that appear when you scroll to them (see components/Reveal.js) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* "Quick view" on a suit card.
+   Mouse: a dark bar slides up over the bottom of the photo.
+   Touch screens: a small round eye button in the corner. */
+.qv-btn {
+  position: absolute;
+  z-index: 5;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 0.7rem 0.5rem;
+  background: rgba(17, 17, 17, 0.9);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease-out, background-color 0.3s ease;
+}
+.qv-btn:hover {
+  background: #000;
+}
+.product-card:hover .qv-btn,
+.qv-btn:focus-visible {
+  opacity: 1;
+  transform: none;
+}
+.qv-icon {
+  display: none;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+@media (hover: none) {
+  .qv-btn {
+    left: auto;
+    right: 8px;
+    bottom: 8px;
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+    opacity: 1;
+    transform: none;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  }
+  .qv-btn:hover {
+    background: #fff;
+  }
+  .qv-text {
+    display: none;
+  }
+  .qv-icon {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-in,
+  .fade-in,
+  .cart-line-in,
+  .pop,
+  .cart-badge {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
