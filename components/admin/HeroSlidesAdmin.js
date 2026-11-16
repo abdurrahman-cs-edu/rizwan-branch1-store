@@ -266,7 +266,7 @@ export default function HeroSlidesAdmin() {
                       <img src={current.url} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition }} />
                       <div className="absolute inset-0" style={shade} />
                       <p className="font-display relative flex h-full items-center justify-center px-2 text-center text-xl uppercase tracking-[0.1em] text-white">
-                        {current.title || "Rizwan Clothing"}
+                        {current.title}
                       </p>
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export default function HeroSlidesAdmin() {
                       <img src={current.url} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition }} />
                       <div className="absolute inset-0" style={shade} />
                       <p className="font-display relative flex h-full items-center justify-center px-1 text-center text-sm uppercase tracking-[0.08em] text-white">
-                        {current.title || "Rizwan Clothing"}
+                        {current.title}
                       </p>
                     </div>
                   </div>
@@ -284,19 +284,19 @@ export default function HeroSlidesAdmin() {
               </div>
 
               <label className="block text-sm">
-                3. Big heading on this photo (optional)
+                3. Big heading in the middle of this photo (optional)
                 <input
                   type="text"
                   maxLength={40}
                   value={current.title}
                   onChange={(e) => edit({ title: e.target.value })}
-                  placeholder="For example: Eid Special. Empty shows “Rizwan Clothing”."
+                  placeholder="For example: Eid Special. Leave empty for no heading."
                   className="mt-1 block w-full rounded border border-stone-300 px-3 py-2"
                 />
               </label>
 
               <label className="block text-sm">
-                4. The “Shop now” button opens
+                4. The “Shop now” button (at the bottom of the photo) opens
                 <select
                   value={current.link}
                   onChange={(e) => edit({ link: e.target.value })}

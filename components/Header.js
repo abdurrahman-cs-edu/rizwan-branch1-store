@@ -98,7 +98,7 @@ export default function Header({ menu = MENU }) {
       <div className="site-bar border-b border-stone-200 bg-white/95 text-[#111] backdrop-blur transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-2">
-            {/* Left: menu button (phones, tablets) and search */}
+            {/* Left: menu button (phones, tablets) and the search icon */}
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -108,25 +108,15 @@ export default function Header({ menu = MENU }) {
               >
                 <MenuIcon open={menuOpen} />
               </button>
-              {/* Search bar (laptops and bigger) */}
-              <form action="/search" role="search" className="relative hidden lg:block">
-                <input
-                  type="search"
-                  name="q"
-                  placeholder="Search suits"
-                  aria-label="Search suits"
-                  className="site-search peer h-10 w-40 rounded-full border border-stone-300 bg-stone-50 pl-9 pr-4 text-sm outline-none transition-all placeholder:text-stone-400 focus:w-52 focus:border-[#111] focus:bg-white xl:w-48 xl:focus:w-60"
-                />
-                <SearchIcon className="site-search-icon pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
-              </form>
-              {/* Search button (phones, tablets): opens the bar under the header */}
+              {/* Search: a thin-line icon; opens the search bar under the header */}
               <button
                 type="button"
-                className="site-btn rounded-full p-1.5 hover:bg-stone-100 lg:hidden"
+                className="site-btn rounded-full p-1.5 hover:bg-stone-100"
                 aria-label="Search"
+                aria-expanded={searchOpen}
                 onClick={() => setSearchOpen((v) => !v)}
               >
-                <SearchIcon />
+                <SearchIcon className="h-[26px] w-[26px]" />
               </button>
             </div>
 
@@ -136,14 +126,17 @@ export default function Header({ menu = MENU }) {
                 src="/logo.svg"
                 alt={SITE.name}
                 className={`site-logo w-auto transition-[height,filter] duration-200 ${
-                  scrolled ? "h-9 sm:h-11" : "h-11 sm:h-16 xl:h-20"
+                  scrolled ? "h-10 sm:h-12" : "h-12 sm:h-20 xl:h-24"
                 }`}
               />
-              {!scrolled && (
-                <span className="site-branch font-logo mt-0.5 text-[9px] uppercase tracking-[0.35em] text-stone-600 sm:text-[10px]">
-                  {SITE.branch}
-                </span>
-              )}
+              {/* "Branch 1" stays visible so people see at once that this is the Branch 1 website */}
+              <span
+                className={`site-branch font-logo uppercase text-stone-700 transition-all duration-200 ${
+                  scrolled ? "mt-0 text-[10px] tracking-[0.3em] sm:text-xs" : "mt-1 text-xs tracking-[0.32em] sm:text-lg xl:text-xl"
+                }`}
+              >
+                {SITE.branch}
+              </span>
             </Link>
 
             {/* Right: log in, cart */}
@@ -201,7 +194,7 @@ export default function Header({ menu = MENU }) {
         </div>
 
         {searchOpen && (
-          <form action="/search" role="search" className="mx-auto flex max-w-7xl gap-2 px-4 pb-3 lg:hidden">
+          <form action="/search" role="search" className="mx-auto flex max-w-2xl gap-2 px-4 pb-3 pt-1">
             <div className="relative w-full">
               <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
               <input

@@ -9,6 +9,7 @@ const INTERVAL = 5500; // milliseconds each photo stays
 // The header sits on top of it (see Header.js). Photos fade into each other,
 // change by themselves, and can be swiped on a phone or changed with the dots / arrows.
 export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
+  // siteName and tagline are only for search engines and screen readers (hidden heading); nothing is written on the photos unless the admin adds a heading.
   const n = slides.length;
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -79,15 +80,18 @@ export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
           />
           {/* Dark layer so the writing is easy to read on any photo */}
           <div className="absolute inset-0" style={{ background: `rgba(0,0,0,${dark})` }} />
-          <div className="relative flex h-full flex-col items-center justify-center px-6 pt-16 text-center [text-shadow:0_2px_18px_rgba(0,0,0,0.5)]">
-            <p className="font-display max-w-4xl text-balance text-3xl uppercase tracking-[0.06em] sm:text-6xl lg:text-7xl">
-              {s.title || siteName}
-            </p>
-            {!s.title && tagline && <p className="mt-3 text-stone-100 sm:text-lg">{tagline}</p>}
+          {/* Heading in the middle: only when the admin wrote one for this photo */}
+          {s.title && (
+            <div className="relative flex h-full flex-col items-center justify-center px-6 pt-16 text-center [text-shadow:0_2px_18px_rgba(0,0,0,0.5)]">
+              <p className="font-display max-w-4xl text-balance text-3xl uppercase tracking-[0.06em] sm:text-6xl lg:text-7xl">{s.title}</p>
+            </div>
+          )}
+          {/* Button at the bottom of the photo */}
+          <div className="absolute inset-x-0 bottom-16 z-20 flex justify-center px-6">
             <Link
               href={s.link || "/collections"}
               tabIndex={k === i ? 0 : -1}
-              className="mt-8 inline-block border border-white px-8 py-3 text-[13px] uppercase tracking-[0.3em] [text-shadow:none] hover:bg-white hover:text-[#111]"
+              className="inline-block border border-white bg-black/10 px-8 py-3 text-[13px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#111]"
             >
               Shop now
             </Link>
@@ -95,8 +99,9 @@ export default function HeroSlider({ slides, dark = 0.3, siteName, tagline }) {
         </div>
       ))}
 
-      {/* Soft dark band at the top so the white header writing can be read on bright photos */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-44 bg-gradient-to-b from-black/50 to-transparent" />
+      {/* Soft dark bands at the top and bottom so the white header and the button can be read on bright photos */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-52 bg-gradient-to-b from-black/50 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-44 bg-gradient-to-t from-black/40 to-transparent" />
 
       {n > 1 && (
         <>

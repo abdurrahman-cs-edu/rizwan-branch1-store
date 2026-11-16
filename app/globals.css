@@ -57,32 +57,10 @@ body:has([data-home-hero]) .site-header[data-clear="true"] .site-logo {
   filter: brightness(0) invert(1); /* the logo file is dark; this makes it white */
 }
 body:has([data-home-hero]) .site-header[data-clear="true"] .site-branch {
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
 }
 body:has([data-home-hero]) .site-header[data-clear="true"] .site-btn:hover {
   background-color: rgba(255, 255, 255, 0.15);
-}
-body:has([data-home-hero]) .site-header[data-clear="true"] .site-search {
-  border-color: rgba(255, 255, 255, 0.6);
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-body:has([data-home-hero]) .site-header[data-clear="true"] .site-search::placeholder {
-  color: rgba(255, 255, 255, 0.75);
-}
-body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus {
-  border-color: #fff;
-  background-color: #fff;
-  color: #111;
-}
-body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus::placeholder {
-  color: #a8a29e;
-}
-body:has([data-home-hero]) .site-header[data-clear="true"] .site-search-icon {
-  color: rgba(255, 255, 255, 0.85);
-}
-body:has([data-home-hero]) .site-header[data-clear="true"] .site-search:focus ~ .site-search-icon {
-  color: #78716c;
 }
 
 /* Prices and other numbers: same style as the English words in the logo.

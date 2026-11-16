@@ -87,12 +87,13 @@ export default async function Home() {
       {slides.length > 0 ? (
         <HeroSlider slides={slides} dark={heroDark} siteName={SITE.name} tagline={SITE.tagline} />
       ) : (
-        <section data-home-hero className="relative flex h-[86svh] min-h-[460px] flex-col items-center justify-center bg-stone-900 px-6 pt-16 text-center text-white sm:h-[92svh]">
-          <h1 className="text-3xl sm:text-6xl">{SITE.name}</h1>
-          <p className="mt-3 text-stone-100">{SITE.tagline}</p>
+        <section data-home-hero className="relative flex h-[86svh] min-h-[460px] flex-col items-center justify-end bg-stone-900 px-6 pb-16 text-center text-white sm:h-[92svh]">
+          <h1 className="sr-only">
+            {SITE.name}: {SITE.tagline}
+          </h1>
           <Link
             href="/collections"
-            className="mt-8 inline-block border border-white px-8 py-3 text-[13px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#111]"
+            className="inline-block border border-white px-8 py-3 text-[13px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#111]"
           >
             Shop now
           </Link>
