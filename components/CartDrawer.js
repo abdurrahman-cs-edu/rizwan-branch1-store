@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCart, lineKey } from "@/components/CartProvider";
-import { formatPKR } from "@/lib/products";
+import Price from "@/components/Price";
 
 export default function CartDrawer() {
   const { items, subtotal, drawerOpen, closeDrawer, setQty, remove } = useCart();
@@ -38,10 +38,10 @@ export default function CartDrawer() {
                   <div className="flex-1 text-sm">
                     <p className="font-medium">{l.name}</p>
                     <p className="text-stone-500">Size {l.size}</p>
-                    <p>{formatPKR(l.price)}</p>
+                    <p><Price value={l.price} /></p>
                     <div className="mt-1 flex items-center gap-2">
                       <button type="button" className="h-6 w-6 rounded border" onClick={() => setQty(key, l.qty - 1)}>−</button>
-                      <span>{l.qty}</span>
+                      <span className="num">{l.qty}</span>
                       <button type="button" className="h-6 w-6 rounded border" onClick={() => setQty(key, l.qty + 1)}>+</button>
                       <button type="button" className="ml-auto text-xs text-red-600 underline" onClick={() => remove(key)}>
                         Remove
@@ -57,7 +57,7 @@ export default function CartDrawer() {
         <div className="space-y-2 border-t border-stone-200 p-4">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span className="font-semibold">{formatPKR(subtotal)}</span>
+            <span className="font-semibold"><Price value={subtotal} /></span>
           </div>
           <Link
             href="/cart"

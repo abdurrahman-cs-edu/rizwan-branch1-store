@@ -39,6 +39,15 @@ h1 {
   font-weight: 400;
 }
 
+/* Prices and other numbers: same style as the English words in the logo.
+   Slightly smaller because this font is wide. One weight only, so no fake bold. */
+.num {
+  font-family: var(--font-logo), var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 0.82em;
+  letter-spacing: 0.02em;
+}
+
 /* Glowing sale tag (shown under the suit when a sale is on) */
 .sale-tag {
   display: inline-flex;

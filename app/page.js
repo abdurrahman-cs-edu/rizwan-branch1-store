@@ -5,6 +5,7 @@ import {
   getCollections,
   getHomeCover,
   getHomeSections,
+  getHomeSlides,
   getReviews,
   getTrendingSlugs,
   productsInCollection,
@@ -13,26 +14,36 @@ import { isOnSale } from "@/lib/products";
 import ProductSection from "@/components/ProductSection";
 import ReviewsStrip from "@/components/ReviewsStrip";
 import DemoNotice from "@/components/DemoNotice";
+import HeroSlider from "@/components/HeroSlider";
 
 export const revalidate = 60;
 
 export default async function Home() {
-  const [{ products, isDemo }, collections, sections, trendingSlugs, reviews, cover] = await Promise.all([
+  const [{ products, isDemo }, collections, sections, trendingSlugs, reviews, cover, slideshow] = await Promise.all([
     getCatalogue(),
     getCollections(),
     getHomeSections(),
     getTrendingSlugs(),
     getReviews(),
     getHomeCover(),
+    getHomeSlides(),
   ]);
-  // Cover photo: the one uploaded in the admin panel, otherwise the photo of the first suit.
-  const coverUrl =
-    cover?.url ||
-    products.find((p) => !p.sold_out && p.images?.[0])?.images[0] ||
-    products.find((p) => p.images?.[0])?.images[0] ||
-    null;
-  const coverDark = cover?.dark ?? 0.55;
-  const coverPos = `${cover?.x ?? 50}% ${cover?.y ?? 30}%`;
+  // Slideshow photos: the ones chosen in the admin panel. Until the admin saves a slideshow,
+  // the old single cover photo (if any) is followed by the photos of a few suits, so the page already moves.
+  let slides = slideshow?.slides || [];
+  let heroDark = slideshow?.dark ?? 0.3;
+  if (!slideshow) {
+    const suitPhotos = products
+      .filter((p) => !p.sold_out && p.images?.[0])
+      .slice(0, cover?.url ? 3 : 4)
+      .map((p) => ({ url: p.images[0], x: 50, y: 30, title: "", link: `/products/${p.slug}` }));
+    slides = [...(cover?.url ? [{ url: cover.url, x: cover.x, y: cover.y, title: "", link: "/collections" }] : []), ...suitPhotos];
+    heroDark = Math.min(cover?.dark ?? 0.3, 0.45);
+  }
+  if (slides.length === 0) {
+    const any = products.find((p) => p.images?.[0]);
+    slides = [{ url: any?.images[0] || "", x: 50, y: 30, title: "", link: "/collections" }].filter((x) => x.url);
+  }
   // The "On sale" shortcut and filter only appear while at least one suit is on sale.
   const saleOn = products.some((p) => isOnSale(p) && !p.sold_out);
 
@@ -73,27 +84,20 @@ export default async function Home() {
     <>
       <DemoNotice show={isDemo} />
 
-      <section className="relative isolate overflow-hidden bg-stone-900 px-4 py-20 text-center text-white sm:py-32">
-        {coverUrl && (
-          <img
-            src={coverUrl}
-            alt=""
-            fetchPriority="high"
-            className="absolute inset-0 -z-20 h-full w-full object-cover"
-            style={{ objectPosition: coverPos }}
-          />
-        )}
-        {/* Dark layer so the writing is easy to read on any photo */}
-        <div className="absolute inset-0 -z-10" style={{ background: `rgba(0,0,0,${coverDark})` }} />
-        <h1 className="text-3xl sm:text-5xl [text-shadow:0_2px_14px_rgba(0,0,0,0.55)]">{SITE.name}</h1>
-        <p className="mt-3 text-stone-100 [text-shadow:0_1px_8px_rgba(0,0,0,0.5)]">{SITE.tagline}</p>
-        <Link
-          href="/collections"
-          className="mt-8 inline-block bg-white px-8 py-3 text-[13px] font-bold uppercase tracking-[0.3em] text-[#111] hover:bg-stone-200"
-        >
-          Shop all collections
-        </Link>
-      </section>
+      {slides.length > 0 ? (
+        <HeroSlider slides={slides} dark={heroDark} siteName={SITE.name} tagline={SITE.tagline} />
+      ) : (
+        <section className="relative flex h-[86svh] min-h-[460px] flex-col items-center justify-center bg-stone-900 px-6 pt-16 text-center text-white sm:h-[92svh]">
+          <h1 className="text-3xl sm:text-6xl">{SITE.name}</h1>
+          <p className="mt-3 text-stone-100">{SITE.tagline}</p>
+          <Link
+            href="/collections"
+            className="mt-8 inline-block border border-white px-8 py-3 text-[13px] uppercase tracking-[0.3em] hover:bg-white hover:text-[#111]"
+          >
+            Shop now
+          </Link>
+        </section>
+      )}
 
       <section className="mx-auto max-w-6xl px-4 pb-2 pt-8">
         <div className="flex flex-wrap justify-center gap-3">

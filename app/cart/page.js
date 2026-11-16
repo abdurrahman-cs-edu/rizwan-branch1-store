@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCart, lineKey } from "@/components/CartProvider";
-import { formatPKR } from "@/lib/products";
+import Price from "@/components/Price";
 import { PREPAID_DISCOUNT_PERCENT, SHIPPING_FEE } from "@/lib/config";
 
 export default function CartPage() {
@@ -36,15 +36,15 @@ export default function CartPage() {
               <div className="flex-1 text-sm">
                 <Link href={`/products/${l.slug}`} className="font-medium hover:underline">{l.name}</Link>
                 <p className="text-stone-500">Size {l.size}</p>
-                <p>{formatPKR(l.price)}</p>
+                <p><Price value={l.price} /></p>
                 <div className="mt-2 flex items-center gap-2">
                   <button type="button" className="h-7 w-7 rounded border" onClick={() => setQty(key, l.qty - 1)}>−</button>
-                  <span className="w-6 text-center">{l.qty}</span>
+                  <span className="num w-6 text-center">{l.qty}</span>
                   <button type="button" className="h-7 w-7 rounded border" onClick={() => setQty(key, l.qty + 1)}>+</button>
                   <button type="button" className="ml-4 text-xs text-red-600 underline" onClick={() => remove(key)}>Remove</button>
                 </div>
               </div>
-              <div className="text-sm font-semibold">{formatPKR(l.price * l.qty)}</div>
+              <div className="text-sm font-semibold"><Price value={l.price * l.qty} /></div>
             </div>
           );
         })}
@@ -53,11 +53,11 @@ export default function CartPage() {
       <div className="mt-6 rounded-lg bg-stone-50 p-4">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span className="font-semibold">{formatPKR(subtotal)}</span>
+          <span className="font-semibold"><Price value={subtotal} /></span>
         </div>
         <p className="mt-1 text-xs text-green-700">
           Choose Advance / prepaid payment at checkout to get an additional {PREPAID_DISCOUNT_PERCENT}% discount.
-          A flat delivery charge of {formatPKR(SHIPPING_FEE)} is added at checkout.
+          A flat delivery charge of <Price value={SHIPPING_FEE} /> is added at checkout.
         </p>
         <Link
           href="/checkout"

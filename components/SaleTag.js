@@ -4,5 +4,5 @@ import { salePercent } from "@/lib/products";
 export default function SaleTag({ p, className = "" }) {
   const percent = salePercent(p);
   if (!percent || p.sold_out) return null;
-  return <span className={`sale-tag ${className}`}>✦ {percent}% off</span>;
+  return <span className={`sale-tag ${className}`}>✦ <span className="num">{percent}%</span> off</span>;
 }

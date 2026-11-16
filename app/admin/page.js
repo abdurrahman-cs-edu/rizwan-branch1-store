@@ -7,7 +7,7 @@ import ProductsAdmin from "@/components/admin/ProductsAdmin";
 import SectionsAdmin from "@/components/admin/SectionsAdmin";
 import SizeChartAdmin from "@/components/admin/SizeChartAdmin";
 import ReviewsAdmin from "@/components/admin/ReviewsAdmin";
-import CoverImageAdmin from "@/components/admin/CoverImageAdmin";
+import HeroSlidesAdmin from "@/components/admin/HeroSlidesAdmin";
 
 const TABS = [
   ["orders", "Orders"],
@@ -129,7 +129,7 @@ export default function AdminPage() {
       {tab === "products" && <ProductsAdmin />}
       {tab === "home" && (
         <>
-          <CoverImageAdmin />
+          <HeroSlidesAdmin />
           <SectionsAdmin />
         </>
       )}

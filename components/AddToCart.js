@@ -89,7 +89,7 @@ export default function AddToCart({ product }) {
           ))}
         </div>
         {left(size) !== null && left(size) <= 5 && (
-          <p className="mt-2 text-xs text-red-600">Only {left(size)} left in size {size}</p>
+          <p className="mt-2 text-xs text-red-600">Only <span className="num">{left(size)}</span> left in size {size}</p>
         )}
       </div>
 
@@ -97,7 +97,7 @@ export default function AddToCart({ product }) {
         <p className="mb-2 text-sm font-medium uppercase tracking-[0.15em]">Quantity</p>
         <div className="inline-flex items-center border border-stone-300">
           <button type="button" aria-label="Less" className="px-3 py-2" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
-          <span className="w-10 text-center">{qty}</span>
+          <span className="num w-10 text-center">{qty}</span>
           <button type="button" aria-label="More" className="px-3 py-2" onClick={() => setQty((q) => Math.min(maxQty, q + 1))}>+</button>
         </div>
       </div>

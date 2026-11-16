@@ -7,7 +7,8 @@ import { useCart } from "@/components/CartProvider";
 import AdvancePaymentInfo from "@/components/AdvancePaymentInfo";
 import { supabase } from "@/lib/supabase";
 import { CITIES, PREPAID_DISCOUNT_PERCENT, SHIPPING_FEE } from "@/lib/config";
-import { formatPKR, normalizePhone } from "@/lib/products";
+import { normalizePhone } from "@/lib/products";
+import Price from "@/components/Price";
 
 // Rounded input with a floating label (like the rizwanclothing.com checkout).
 function Field({ id, label, error, multiline = false, ...props }) {
@@ -196,14 +197,14 @@ export default function CheckoutPage() {
                 {l.image && <img src={l.image} alt="" className="h-full w-full object-cover" />}
               </div>
               <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-stone-800 px-1 text-xs font-medium text-white">
-                {l.qty}
+                <span className="num">{l.qty}</span>
               </span>
             </div>
             <div className="min-w-0 flex-1">
               <p className="line-clamp-2 font-medium text-stone-900">{l.name}</p>
               <p className="text-xs text-stone-500">{l.size}</p>
             </div>
-            <span className="text-stone-900">{formatPKR(l.price * l.qty)}</span>
+            <span className="text-stone-900"><Price value={l.price * l.qty} /></span>
           </li>
         ))}
       </ul>
@@ -211,23 +212,23 @@ export default function CheckoutPage() {
       <div className="mt-6 space-y-2">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>{formatPKR(subtotal)}</span>
+          <span><Price value={subtotal} /></span>
         </div>
         {discount > 0 && (
           <div className="flex justify-between text-green-700">
             <span>Prepaid discount ({PREPAID_DISCOUNT_PERCENT}%)</span>
-            <span>− {formatPKR(discount)}</span>
+            <span>− <Price value={discount} /></span>
           </div>
         )}
         <div className="flex justify-between">
           <span>Shipping</span>
-          <span>{formatPKR(SHIPPING_FEE)}</span>
+          <span><Price value={SHIPPING_FEE} /></span>
         </div>
         <div className="flex items-baseline justify-between pt-2 text-lg font-semibold text-stone-900">
           <span>Total</span>
           <span>
             <span className="mr-2 text-xs font-normal text-stone-500">PKR</span>
-            {formatPKR(total)}
+            <Price value={total} />
           </span>
         </div>
       </div>
@@ -246,7 +247,7 @@ export default function CheckoutPage() {
       <details className="mb-6 rounded-xl bg-stone-100 md:hidden">
         <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-[var(--accent)]">
           <span>Show order summary</span>
-          <span className="text-stone-900">{formatPKR(total)}</span>
+          <span className="text-stone-900"><Price value={total} /></span>
         </summary>
         <div className="px-4 pb-4">{summary}</div>
       </details>

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { effectivePrice, formatPKR, isOnSale } from "@/lib/products";
+import { effectivePrice, isOnSale } from "@/lib/products";
+import Price from "@/components/Price";
 import SaleTag from "@/components/SaleTag";
 
 export default function ProductCard({ p }) {
@@ -48,11 +49,11 @@ export default function ProductCard({ p }) {
         <p className="mt-1">
           {onSale ? (
             <>
-              <span className="mr-2 text-stone-400 line-through">{formatPKR(p.price)}</span>
-              <span className="font-semibold text-red-600">{formatPKR(effectivePrice(p))}</span>
+              <span className="mr-2 text-stone-400 line-through"><Price value={p.price} /></span>
+              <span className="font-semibold text-red-600"><Price value={effectivePrice(p)} /></span>
             </>
           ) : (
-            <span className="font-medium">{formatPKR(p.price)}</span>
+            <span className="font-medium"><Price value={p.price} /></span>
           )}
         </p>
         {onSale && (

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug, getReviews, getSizeChart } from "@/lib/catalogue";
 import { effectivePrice, formatPKR, isOnSale, productCollectionSlugs } from "@/lib/products";
+import Price from "@/components/Price";
 import { SEASON_LABELS, SHIPPING_FEE, SITE, SIZES, PREPAID_DISCOUNT_PERCENT } from "@/lib/config";
 import ProductGallery from "@/components/ProductGallery";
 import ShareButton from "@/components/ShareButton";
@@ -117,17 +118,17 @@ export default async function ProductPage({ params }) {
             {onSale ? (
               <>
                 <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xl">
-                  <span className="text-stone-400 line-through">{formatPKR(product.price)}</span>
-                  <span className="font-semibold text-red-600">{formatPKR(effectivePrice(product))}</span>
+                  <span className="text-stone-400 line-through"><Price value={product.price} /></span>
+                  <span className="font-semibold text-red-600"><Price value={effectivePrice(product)} /></span>
                   <SaleTag p={product} />
                 </p>
-                <p className="mt-1 text-xs text-red-600">You save {formatPKR(saving)}</p>
+                <p className="mt-1 text-xs text-red-600">You save <Price value={saving} /></p>
               </>
             ) : (
-              <p className="text-xl font-medium">{formatPKR(product.price)}</p>
+              <p className="text-xl font-medium"><Price value={product.price} /></p>
             )}
             <p className="mt-1 text-xs text-stone-500">
-              Flat delivery charge of {formatPKR(SHIPPING_FEE)} per order, added at checkout.
+              Flat delivery charge of <Price value={SHIPPING_FEE} /> per order, added at checkout.
             </p>
             <p className="mt-1 text-xs text-green-700">
               Get an additional {PREPAID_DISCOUNT_PERCENT}% discount on prepaid orders
