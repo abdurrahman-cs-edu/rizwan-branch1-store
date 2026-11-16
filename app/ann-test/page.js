@@ -3,6 +3,7 @@
 // TEMPORARY page to look at every announcement style. Removed before the pull request is finished.
 import { useState } from "react";
 import AlertBar from "@/components/AlertBar";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import AlertEditor from "@/components/admin/AlertEditor";
 import { COLOR_PRESETS, STYLES, normalizeAlert } from "@/lib/announcements";
 
@@ -19,6 +20,17 @@ export default function Page() {
   return (
     <div className="mx-auto max-w-5xl space-y-3 p-4">
       <h1 className="text-lg font-bold">Announcement styles (test)</h1>
+      <p className="text-xs text-stone-500">Real AnnouncementBar: one closable bar should show; the future one and the expired one must not.</p>
+      <div data-real>
+        <AnnouncementBar
+          serverNow={Date.now()}
+          alerts={[
+            normalizeAlert({ id: "now1", messages: [{ text: "Closable bar" }], closable: true, style: "still", color: "green" }),
+            normalizeAlert({ id: "fut1", messages: [{ text: "FUTURE bar" }], start: new Date(Date.now() + 3600e3).toISOString() }),
+            normalizeAlert({ id: "old1", messages: [{ text: "EXPIRED bar" }], end: new Date(Date.now() - 3600e3).toISOString() }),
+          ]}
+        />
+      </div>
       {STYLES.map((s, i) => (
         <div key={s.key} data-style={s.key}>
           <p className="text-xs text-stone-500">{s.label}</p>
