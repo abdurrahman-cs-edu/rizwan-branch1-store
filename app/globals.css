@@ -140,3 +140,178 @@ a:focus-visible > .slide-underline,
 /* Hide the scrollbar on the feedback strip (still scrolls) */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+
+/* ------------------------------------------------------------------
+   Motion: smooth opening, closing, hovering and page changes.
+   Everything below stands still for people who turned animations off.
+   ------------------------------------------------------------------ */
+
+/* Every link and button changes colour smoothly, and shows a hand cursor.
+   (In the base layer, so a class like "transition-opacity duration-700" still wins.) */
+@layer base {
+  button:not(:disabled),
+  [role="button"],
+  summary {
+    cursor: pointer;
+  }
+  a,
+  button {
+    transition-property: color, background-color, border-color, text-decoration-color, opacity, box-shadow;
+    transition-duration: 250ms;
+    transition-timing-function: ease;
+  }
+}
+
+/* A new page fades in and rises a little */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.page-in {
+  animation: page-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: fade-in 0.45s ease-out backwards;
+}
+
+/* A suit in the cart slides in */
+@keyframes cart-line-in {
+  from { opacity: 0; transform: translateX(18px); }
+  to { opacity: 1; transform: none; }
+}
+.cart-line-in {
+  animation: cart-line-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+/* A number that just changed (quantity, total) gives a small bump */
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.pop {
+  display: inline-block;
+  animation: pop 0.35s ease-out;
+}
+@keyframes badge-bump {
+  0% { transform: scale(0.4); }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+.cart-badge {
+  animation: badge-bump 0.4s ease-out;
+}
+
+/* Buttons sink a little when pressed */
+.press {
+  transition: transform 0.15s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+    opacity 0.3s ease, box-shadow 0.3s ease;
+}
+.press:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+/* Things that appear when you scroll to them (see components/Reveal.js) */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* "Quick view" on a suit card.
+   Mouse: a dark bar slides up over the bottom of the photo.
+   Touch screens: a small round eye button in the corner. */
+.qv-btn {
+  position: absolute;
+  z-index: 5;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 0.7rem 0.5rem;
+  background: rgba(17, 17, 17, 0.9);
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease-out, background-color 0.3s ease;
+}
+.qv-btn:hover {
+  background: #000;
+}
+.product-card:hover .qv-btn,
+.qv-btn:focus-visible {
+  opacity: 1;
+  transform: none;
+}
+.qv-icon {
+  display: none;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+@media (hover: none) {
+  .qv-btn {
+    left: auto;
+    right: 8px;
+    bottom: 8px;
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+    opacity: 1;
+    transform: none;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  }
+  .qv-btn:hover {
+    background: #fff;
+  }
+  .qv-text {
+    display: none;
+  }
+  .qv-icon {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-in,
+  .fade-in,
+  .cart-line-in,
+  .pop,
+  .cart-badge {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

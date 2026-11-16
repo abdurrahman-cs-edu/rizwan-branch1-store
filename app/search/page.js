@@ -1,6 +1,7 @@
 import { getCatalogue } from "@/lib/catalogue";
 import { productCollectionSlugs } from "@/lib/products";
 import CollectionView from "@/components/CollectionView";
+import { WIDE } from "@/lib/layout";
 
 export const metadata = { title: "Search", robots: { index: false } };
 
@@ -19,7 +20,7 @@ export default async function SearchPage({ searchParams }) {
 
   return (
     <>
-      <div className="mx-auto max-w-6xl px-4 pt-8">
+      <div className={`${WIDE} pt-8`}>
         <h1 className="text-2xl font-bold">Search</h1>
         <form action="/search" className="mt-3 flex max-w-md gap-2">
           <input

@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { QuickViewProvider } from "@/components/QuickView";
 
 // The menu comes from the collections in the admin panel; a change shows within a minute.
 export const revalidate = 60;
@@ -39,12 +40,14 @@ export default async function RootLayout({ children }) {
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable} ${logoFont.variable}`}>
       <body className="flex min-h-screen flex-col">
         <CartProvider>
-          <AnnouncementBar />
-          <Header menu={menu} />
-          <div className="flex-1">{children}</div>
-          <Footer />
-          <CartDrawer />
-          <WhatsAppButton />
+          <QuickViewProvider>
+            <AnnouncementBar />
+            <Header menu={menu} />
+            <div className="flex-1">{children}</div>
+            <Footer />
+            <CartDrawer />
+            <WhatsAppButton />
+          </QuickViewProvider>
         </CartProvider>
       </body>
     </html>

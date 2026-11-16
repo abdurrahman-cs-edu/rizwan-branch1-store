@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
+import { PRODUCT_GRID, WIDE } from "@/lib/layout";
 import FilterToggle from "@/components/FilterToggle";
 import { effectivePrice, isOnSale } from "@/lib/products";
 
@@ -71,7 +72,7 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
   const resetHref = `${basePath}${Object.keys(extraHidden).length ? "?" + new URLSearchParams(extraHidden).toString() : ""}`;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div className={`${WIDE} py-6`}>
       <FilterToggle activeCount={activeCount} total={list.length} resetHref={resetHref}>
       <form action={basePath} className="flex flex-wrap items-end gap-3 text-sm">
         {Object.entries(extraHidden).map(([k, v]) => (
@@ -119,16 +120,16 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
             ))}
           </select>
         </label>
-        <button className="bg-[#111] px-5 py-1.5 text-[13px] uppercase tracking-[0.2em] text-white">Apply</button>
+        <button className="press bg-[#111] px-5 py-1.5 text-[13px] uppercase tracking-[0.2em] text-white transition-opacity hover:opacity-85">Apply</button>
       </form>
       </FilterToggle>
 
       {shown.length === 0 ? (
         <p className="py-12 text-center text-stone-500">No products found.</p>
       ) : (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {shown.map((p) => (
-            <ProductCard key={p.id} p={p} />
+        <div className={PRODUCT_GRID}>
+          {shown.map((p, i) => (
+            <ProductCard key={p.id} p={p} index={i} />
           ))}
         </div>
       )}
@@ -137,7 +138,7 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
         <div className="mt-8 text-center">
           <Link
             href={`${basePath}?${next.toString()}`}
-            className="inline-block rounded border border-stone-400 px-6 py-2 text-sm hover:bg-stone-100"
+            className="press inline-block rounded border border-stone-400 px-6 py-2 text-sm transition-colors duration-300 hover:bg-stone-100"
           >
             View more
           </Link>

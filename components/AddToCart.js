@@ -7,9 +7,11 @@ import { useCart } from "@/components/CartProvider";
 import { effectivePrice } from "@/lib/products";
 
 const BIG_BUTTON =
-  "w-full border border-[#111] py-3.5 text-[13px] font-bold uppercase tracking-[0.3em] transition";
+  "press w-full border border-[#111] py-3.5 text-[13px] font-bold uppercase tracking-[0.3em] transition";
 
-export default function AddToCart({ product }) {
+// compact = used inside the quick-view pop-up (no size-guide link, a little tighter).
+// onDone = called after the suit was added or "Buy it now" was pressed (the pop-up closes itself then).
+export default function AddToCart({ product, compact = false, onDone }) {
   const { add } = useCart();
   const router = useRouter();
   // stock = {"S":3,"M":0,...}; null means the shop does not count quantity for this suit
@@ -52,20 +54,22 @@ export default function AddToCart({ product }) {
     add(item());
     // Back to 1, so choosing another size afterwards cannot add the same big quantity again by mistake.
     setQty(1);
+    onDone?.();
   }
 
   // Buy it now: put the suit in the cart and go straight to checkout.
   function onBuyNow() {
     add(item(), { silent: true });
+    onDone?.();
     router.push("/checkout");
   }
 
   return (
-    <div className="mt-5 space-y-5">
+    <div className={compact ? "mt-4 space-y-4" : "mt-5 space-y-5"}>
       <div>
         <div className="mb-2 flex items-center justify-between">
           <p className="text-sm font-medium uppercase tracking-[0.15em]">Size</p>
-          <a href="#size-chart" className="text-xs text-stone-600 underline">Size guide</a>
+          {!compact && <a href="#size-chart" className="text-xs text-stone-600 underline">Size guide</a>}
         </div>
         <div className="flex flex-wrap gap-2">
           {SIZES.map((s) => (
@@ -76,7 +80,7 @@ export default function AddToCart({ product }) {
               disabled={!inStock(s)}
               title={inStock(s) ? undefined : "Sold out in this size"}
               className={
-                "min-w-12 border px-3 py-2 text-sm " +
+                "press min-w-12 border px-3 py-2 text-sm transition-colors duration-200 " +
                 (!inStock(s)
                   ? "cursor-not-allowed border-stone-200 text-stone-300 line-through"
                   : s === size
@@ -96,9 +100,9 @@ export default function AddToCart({ product }) {
       <div>
         <p className="mb-2 text-sm font-medium uppercase tracking-[0.15em]">Quantity</p>
         <div className="inline-flex items-center border border-stone-300">
-          <button type="button" aria-label="Less" className="px-3 py-2" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
-          <span className="num w-10 text-center">{qty}</span>
-          <button type="button" aria-label="More" className="px-3 py-2" onClick={() => setQty((q) => Math.min(maxQty, q + 1))}>+</button>
+          <button type="button" aria-label="Less" className="press px-3 py-2 transition-colors hover:bg-stone-100" onClick={() => setQty((q) => Math.max(1, q - 1))}>−</button>
+          <span key={qty} className="num pop w-10 text-center">{qty}</span>
+          <button type="button" aria-label="More" className="press px-3 py-2 transition-colors hover:bg-stone-100" onClick={() => setQty((q) => Math.min(maxQty, q + 1))}>+</button>
         </div>
       </div>
 

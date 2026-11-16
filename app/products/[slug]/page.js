@@ -12,6 +12,7 @@ import ReviewsStrip from "@/components/ReviewsStrip";
 import SaleTag from "@/components/SaleTag";
 import ProductSection from "@/components/ProductSection";
 import DemoNotice from "@/components/DemoNotice";
+import RecentlyViewed from "@/components/RecentlyViewed";
 
 export const revalidate = 60;
 
@@ -75,9 +76,14 @@ export default async function ProductPage({ params }) {
     { label: "Sizes", value: SIZES.join(", ") },
   ].filter((d) => d.value);
 
-  const related = products
-    .filter((p) => p.slug !== product.slug && productCollectionSlugs(p).some((s) => myCollections.includes(s)))
-    .slice(0, 4);
+  // "You may also like": suits from the same collections first (available ones before sold out),
+  // then other suits, so there is always one full row.
+  const others = products.filter((p) => p.slug !== product.slug);
+  const sameCollection = others
+    .filter((p) => productCollectionSlugs(p).some((s) => myCollections.includes(s)))
+    .sort((a, b) => Number(!!a.sold_out) - Number(!!b.sold_out));
+  const rest = others.filter((p) => !sameCollection.includes(p) && !p.sold_out);
+  const related = [...sameCollection, ...rest].slice(0, 4);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -187,9 +193,11 @@ export default async function ProductPage({ params }) {
         </div>
       </div>
 
-      <ReviewsStrip title="Customer feedback" reviews={reviews} />
-
       <ProductSection title="You may also like" products={related} />
+
+      <RecentlyViewed slug={product.slug} />
+
+      <ReviewsStrip title="Customer feedback" reviews={reviews} />
     </>
   );
 }

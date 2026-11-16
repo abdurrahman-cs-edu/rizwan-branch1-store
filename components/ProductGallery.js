@@ -26,7 +26,7 @@ export default function ProductGallery({ images = [], name }) {
               onClick={() => setActive(i)}
               aria-label={`Show image ${i + 1}`}
               className={
-                "aspect-[3/4] w-16 shrink-0 overflow-hidden border-2 md:w-full " +
+                "aspect-[3/4] w-16 shrink-0 overflow-hidden border-2 transition-[opacity,border-color] duration-300 md:w-full " +
                 (i === active ? "border-[#111]" : "border-transparent opacity-70 hover:opacity-100")
               }
             >
@@ -37,7 +37,12 @@ export default function ProductGallery({ images = [], name }) {
       )}
       <div className="order-1 min-w-0 flex-1 md:order-2">
         <div className="aspect-[3/4] w-full overflow-hidden bg-stone-100">
-          <img src={images[active]} alt={name} className="h-full w-full object-cover" />
+          <img
+            key={active}
+            src={images[active]}
+            alt={name}
+            className="fade-in h-full w-full object-cover transition-transform duration-700 ease-out hover:scale-[1.03]"
+          />
         </div>
       </div>
     </div>

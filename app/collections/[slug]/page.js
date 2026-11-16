@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getCatalogue, getCollections, productsInCollection } from "@/lib/catalogue";
 import CollectionView from "@/components/CollectionView";
 import DemoNotice from "@/components/DemoNotice";
+import { WIDE } from "@/lib/layout";
 
 export const revalidate = 60;
 
@@ -31,7 +32,7 @@ export default async function CollectionPage({ params, searchParams }) {
   return (
     <>
       <DemoNotice show={isDemo} />
-      <div className="mx-auto max-w-6xl px-4 pt-8">
+      <div className={`${WIDE} pt-8`}>
         <p className="text-xs text-stone-500">
           <Link href="/" className="underline">Home</Link> / <Link href="/collections" className="underline">Collections</Link>
         </p>
