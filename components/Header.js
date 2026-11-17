@@ -7,7 +7,7 @@ import { MENU, SITE } from "@/lib/config";
 import { useCart } from "@/components/CartProvider";
 import { BagIcon, ChevronIcon, MenuIcon, SearchIcon, UserIcon } from "@/components/Icons";
 
-// menu = [{ label, href, children: [{ label, href }] }], built from the collections in the admin panel.
+// menu = [{ id, label, href, laptop, phone, children: [{ label, href }] }], built from the collections and the Menu tab in the admin panel.
 //
 // On the home page the header sits on top of the big photo: transparent, with white writing and a white logo.
 // Once the page is scrolled (and on every other page) it is a white bar with the dark logo.
@@ -15,6 +15,9 @@ import { BagIcon, ChevronIcon, MenuIcon, SearchIcon, UserIcon } from "@/componen
 // It is NOT recognised by the address, because the server does not always know the address when it
 // rebuilds a page, and then the first screen came out wrong.
 export default function Header({ menu = MENU }) {
+  // Each item can be switched off for the wide-screen bar ("laptop") or for the 3-lines menu ("phone") in the admin panel.
+  const desktopMenu = menu.filter((m) => m.laptop !== false);
+  const phoneMenu = menu.filter((m) => m.phone !== false);
   const { count, openDrawer } = useCart();
   const pathname = usePathname(); // only used to run the effects below again on every new page
   const [menuOpen, setMenuOpen] = useState(false);
@@ -164,17 +167,17 @@ export default function Header({ menu = MENU }) {
 
           {/* Menu links under the logo (wide screens). A drop-down opens only when its small arrow is clicked. */}
           <nav className="hidden justify-center gap-10 pb-3 pt-1 text-[14px] uppercase tracking-[0.16em] xl:flex">
-            {menu.map((m) => {
+            {desktopMenu.map((m) => {
               if (!m.children?.length) {
                 return (
-                  <Link key={m.href} href={m.href} className="slide-underline font-logo pb-1">
+                  <Link key={m.id || m.href} href={m.href} className="slide-underline font-logo pb-1">
                     {m.label}
                   </Link>
                 );
               }
               const isOpen = openNav === m.href;
               return (
-                <div key={m.href} data-nav-item className="relative">
+                <div key={m.id || m.href} data-nav-item className="relative">
                   <div className="flex items-center gap-1">
                     <Link href={m.href} className="slide-underline font-logo pb-1">
                       {m.label}
@@ -256,18 +259,18 @@ export default function Header({ menu = MENU }) {
         >
           <div className="min-h-0 overflow-hidden">
             <nav className="max-h-[75svh] overflow-y-auto border-t border-stone-200 bg-white px-4 py-2 text-[#111]">
-              {menu.map((m) => {
+              {phoneMenu.map((m) => {
                 const kids = m.children || [];
                 if (kids.length === 0) {
                   return (
-                    <Link key={m.href} href={m.href} onClick={() => setMenuOpen(false)} className="font-logo block py-2.5 text-[13px] uppercase tracking-[0.12em]">
+                    <Link key={m.id || m.href} href={m.href} onClick={() => setMenuOpen(false)} className="font-logo block py-2.5 text-[13px] uppercase tracking-[0.12em]">
                       {m.label}
                     </Link>
                   );
                 }
                 const open = openGroup === m.href;
                 return (
-                  <div key={m.href}>
+                  <div key={m.id || m.href}>
                     <div className="flex items-center justify-between">
                       <Link href={m.href} onClick={() => setMenuOpen(false)} className="font-logo flex-1 py-2.5 text-[13px] uppercase tracking-[0.12em]">
                         {m.label}

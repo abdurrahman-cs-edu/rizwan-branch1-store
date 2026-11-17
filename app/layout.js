@@ -1,7 +1,7 @@
 import "./globals.css";
 import { bodyFont, displayFont, logoFont } from "@/lib/fonts";
 import { SITE } from "@/lib/config";
-import { buildMenu, getAnnouncements, getCollections } from "@/lib/catalogue";
+import { buildMenu, getAnnouncements, getCollections, getMenuLayout } from "@/lib/catalogue";
 import { CartProvider } from "@/components/CartProvider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
@@ -34,8 +34,8 @@ export const viewport = {
 };
 
 export default async function RootLayout({ children }) {
-  const [collections, announcements] = await Promise.all([getCollections(), getAnnouncements()]);
-  const menu = buildMenu(collections);
+  const [collections, announcements, menuLayout] = await Promise.all([getCollections(), getAnnouncements(), getMenuLayout()]);
+  const menu = buildMenu(collections, menuLayout);
 
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable} ${logoFont.variable}`}>
