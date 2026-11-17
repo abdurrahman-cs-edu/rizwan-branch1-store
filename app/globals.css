@@ -312,3 +312,84 @@ a:focus-visible > .slide-underline,
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* ------------------------------------------------------------------
+   Announcement bars (the strip at the very top). The styles are chosen in the admin panel.
+   ------------------------------------------------------------------ */
+
+/* News ticker: the text scrolls by itself and stops while the mouse is over it */
+.ann-ticker {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+}
+.ann-track {
+  display: flex;
+  width: max-content;
+  animation: ann-scroll linear infinite;
+  will-change: transform;
+}
+.ann-ticker:hover .ann-track {
+  animation-play-state: paused;
+}
+@keyframes ann-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+/* Rotating messages */
+.ann-fade-in { animation: ann-fade-in 0.55s ease both; }
+.ann-slide-in { animation: ann-slide-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes ann-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ann-slide-in {
+  from { opacity: 0; transform: translateY(70%); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Blinking text (never faster than about 1 blink per second, so it is safe to look at) */
+.ann-blink { animation: ann-blink var(--ann-dur, 1.2s) ease-in-out infinite; }
+@keyframes ann-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.12; }
+}
+
+/* The whole bar glows gently (the glow uses the text colour, so it works on any bar colour) */
+.ann-pulse { animation: ann-pulse var(--ann-dur, 2.2s) ease-in-out infinite; }
+@keyframes ann-pulse {
+  0%, 100% { box-shadow: inset 0 0 0 0 color-mix(in srgb, currentColor 0%, transparent); }
+  50% { box-shadow: inset 0 0 26px 0 color-mix(in srgb, currentColor 42%, transparent); }
+}
+
+/* A streak of light sweeps across the bar */
+.ann-shine { position: relative; overflow: hidden; }
+.ann-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 38%;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 0%, color-mix(in srgb, currentColor 38%, transparent) 50%, transparent 100%);
+  transform: translateX(-120%) skewX(-20deg);
+  animation: ann-shine var(--ann-dur, 3.4s) ease-in-out infinite;
+}
+@keyframes ann-shine {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  60%, 100% { transform: translateX(330%) skewX(-20deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ann-track,
+  .ann-blink,
+  .ann-pulse,
+  .ann-shine::after,
+  .ann-fade-in,
+  .ann-slide-in {
+    animation: none;
+  }
+}

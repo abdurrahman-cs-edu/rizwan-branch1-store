@@ -1,7 +1,7 @@
 import "./globals.css";
 import { bodyFont, displayFont, logoFont } from "@/lib/fonts";
 import { SITE } from "@/lib/config";
-import { buildMenu, getCollections } from "@/lib/catalogue";
+import { buildMenu, getAnnouncements, getCollections } from "@/lib/catalogue";
 import { CartProvider } from "@/components/CartProvider";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
@@ -10,7 +10,7 @@ import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { QuickViewProvider } from "@/components/QuickView";
 
-// The menu comes from the collections in the admin panel; a change shows within a minute.
+// The menu and the announcement bars come from the admin panel; a change shows within a minute.
 export const revalidate = 60;
 
 export const metadata = {
@@ -34,14 +34,15 @@ export const viewport = {
 };
 
 export default async function RootLayout({ children }) {
-  const menu = buildMenu(await getCollections());
+  const [collections, announcements] = await Promise.all([getCollections(), getAnnouncements()]);
+  const menu = buildMenu(collections);
 
   return (
     <html lang="en" className={`${displayFont.variable} ${bodyFont.variable} ${logoFont.variable}`}>
       <body className="flex min-h-screen flex-col">
         <CartProvider>
           <QuickViewProvider>
-            <AnnouncementBar />
+            <AnnouncementBar alerts={announcements.filter((a) => a.enabled)} serverNow={Date.now()} />
             <Header menu={menu} />
             <div className="flex-1">{children}</div>
             <Footer />
