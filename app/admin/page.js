@@ -9,15 +9,28 @@ import SizeChartAdmin from "@/components/admin/SizeChartAdmin";
 import ReviewsAdmin from "@/components/admin/ReviewsAdmin";
 import HeroSlidesAdmin from "@/components/admin/HeroSlidesAdmin";
 import AnnouncementsAdmin from "@/components/admin/AnnouncementsAdmin";
+import MenuAdmin from "@/components/admin/MenuAdmin";
 
 const TABS = [
   ["orders", "Orders"],
   ["products", "Products"],
   ["home", "Home & Collections"],
+  ["menu", "Menu"],
   ["alerts", "Announcements"],
   ["reviews", "Feedback"],
   ["sizes", "Size Chart"],
 ];
+
+// One line under the tabs that says what each tab is for
+const TAB_HELP = {
+  orders: "Orders placed on the website: confirm them, and see the customer details.",
+  products: "Add, edit, hide or delete suits, set prices, sales and stock.",
+  home: "The photos at the top of the home page, the sections under them (New Arrivals, Trending and so on), and your collections.",
+  menu: "What shows in the top menu on laptops and in the 3-lines menu on phones, and in what order. Add links like Sale here.",
+  alerts: "The strip at the very top of the website: news ticker, offers, countdown.",
+  reviews: "Customer feedback shown on the website.",
+  sizes: "The size chart shown on every suit page.",
+};
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -127,6 +140,8 @@ export default function AdminPage() {
         </button>
       </div>
 
+      <p className="mb-5 text-sm text-stone-600">{TAB_HELP[tab]}</p>
+
       {tab === "orders" && <OrdersAdmin />}
       {tab === "products" && <ProductsAdmin />}
       {tab === "home" && (
@@ -135,6 +150,7 @@ export default function AdminPage() {
           <SectionsAdmin />
         </>
       )}
+      {tab === "menu" && <MenuAdmin />}
       {tab === "alerts" && <AnnouncementsAdmin />}
       {tab === "reviews" && <ReviewsAdmin />}
       {tab === "sizes" && <SizeChartAdmin />}
