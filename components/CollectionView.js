@@ -88,7 +88,7 @@ export default function CollectionView({ products, searchParams = {}, basePath, 
         </label>
         <div className="flex flex-col gap-1">
           <span className="text-xs text-stone-500">
-            Price (Rs.){highest > 0 ? `, highest is ${highest.toLocaleString("en-PK")}` : ""}
+            Price (PKR){highest > 0 ? `, highest is ${highest.toLocaleString("en-PK")}` : ""}
           </span>
           <div className="flex items-center gap-2">
             <input

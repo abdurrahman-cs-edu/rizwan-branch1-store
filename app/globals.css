@@ -102,7 +102,7 @@ a:focus-visible > .slide-underline,
    The weight comes from the text around it (the suit cards use a light weight, like logoofficial). */
 .num {
   font-family: var(--font-body), system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
-  white-space: nowrap; /* "Rs. 23,200" never breaks into two lines */
+  white-space: nowrap; /* "PKR 23,200" never breaks into two lines */
 }
 
 /* Glowing sale tag (shown under the suit when a sale is on) */

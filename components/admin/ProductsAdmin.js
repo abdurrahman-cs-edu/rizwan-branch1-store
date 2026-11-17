@@ -287,7 +287,7 @@ export default function ProductsAdmin() {
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-sm font-medium">Price (Rs.) *</label>
+            <label className="mb-1 block text-sm font-medium">Price (PKR) *</label>
             <input className={input} inputMode="numeric" value={form.price} onChange={(e) => setField("price", e.target.value.replace(/[^\d.]/g, ""))} />
           </div>
           <div>
