@@ -130,7 +130,7 @@ export default function Header({ menu = MENU }) {
                   scrolled ? "mt-0.5 w-[76px] sm:w-[104px]" : "mt-1 w-[100px] sm:mt-1.5 sm:w-[165px] xl:w-[200px]"
                 }`}
               />
-              {/* "Branch 1" stays visible so people see at once that this is the Branch 1 website */}
+              {/* The line under the logo (SITE.headerLabel, for example "Unstitched") stays visible on every screen */}
               <span
                 className={`site-branch font-logo uppercase leading-none text-stone-700 transition-all duration-300 ${
                   scrolled
@@ -138,7 +138,7 @@ export default function Header({ menu = MENU }) {
                     : "mt-1.5 text-sm tracking-[0.28em] sm:mt-2 sm:text-xl xl:text-2xl"
                 }`}
               >
-                {SITE.branch}
+                {SITE.headerLabel || SITE.branch}
               </span>
             </Link>
 
