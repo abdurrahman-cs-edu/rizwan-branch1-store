@@ -7,7 +7,8 @@ import { MENU, SITE } from "@/lib/config";
 import { useCart } from "@/components/CartProvider";
 import { BagIcon, ChevronIcon, MenuIcon, SearchIcon, UserIcon } from "@/components/Icons";
 
-// menu = [{ id, label, href, laptop, phone, children: [{ label, href }] }], built from the collections and the Menu tab in the admin panel.
+// menu = { laptop: [item], phone: [item] }, item = { id, label, href, children: [{ label, href }] }, built from the collections and the
+// Menu tab in the admin panel (the PC navbar and the Mobile menu are two separate lists). A plain list is used for both.
 //
 // On the home page the header sits on top of the big photo: transparent, with white writing and a white logo.
 // Once the page is scrolled (and on every other page) it is a white bar with the dark logo.
@@ -15,9 +16,9 @@ import { BagIcon, ChevronIcon, MenuIcon, SearchIcon, UserIcon } from "@/componen
 // It is NOT recognised by the address, because the server does not always know the address when it
 // rebuilds a page, and then the first screen came out wrong.
 export default function Header({ menu = MENU }) {
-  // Each item can be switched off for the wide-screen bar ("laptop") or for the 3-lines menu ("phone") in the admin panel.
-  const desktopMenu = menu.filter((m) => m.laptop !== false);
-  const phoneMenu = menu.filter((m) => m.phone !== false);
+  // The wide-screen bar and the 3-lines menu each have their own list in the admin panel.
+  const desktopMenu = Array.isArray(menu) ? menu : menu.laptop;
+  const phoneMenu = Array.isArray(menu) ? menu : menu.phone;
   const { count, openDrawer } = useCart();
   const pathname = usePathname(); // only used to run the effects below again on every new page
   const [menuOpen, setMenuOpen] = useState(false);

@@ -26,7 +26,7 @@ const TAB_HELP = {
   orders: "Orders placed on the website: confirm them, and see the customer details.",
   products: "Add, edit, hide or delete suits, set prices, sales and stock.",
   home: "The photos at the top of the home page, the sections under them (New Arrivals, Trending and so on), and your collections.",
-  menu: "What shows in the top menu on laptops and in the 3-lines menu on phones, and in what order. Add links like Sale here.",
+  menu: "The PC navbar (top bar on laptops) and the Mobile menu (3 lines on phones) are two separate lists. Each has its own items, order and links, for example Sale only on mobile.",
   alerts: "The strip at the very top of the website: news ticker, offers, countdown.",
   reviews: "Customer feedback shown on the website.",
   sizes: "The size chart shown on every suit page.",
