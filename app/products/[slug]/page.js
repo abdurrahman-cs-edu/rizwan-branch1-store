@@ -123,15 +123,15 @@ export default async function ProductPage({ params }) {
           <div className="mt-4">
             {onSale ? (
               <>
-                <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xl">
+                <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-lg font-light">
                   <span className="text-stone-400 line-through"><Price value={product.price} /></span>
-                  <span className="font-semibold text-red-600"><Price value={effectivePrice(product)} /></span>
+                  <span className="text-red-600"><Price value={effectivePrice(product)} /></span>
                   <SaleTag p={product} />
                 </p>
                 <p className="mt-1 text-xs text-red-600">You save <Price value={saving} /></p>
               </>
             ) : (
-              <p className="text-xl font-medium"><Price value={product.price} /></p>
+              <p className="text-lg font-light text-stone-700"><Price value={product.price} /></p>
             )}
             <p className="mt-1 text-xs text-stone-500">
               Flat delivery charge of <Price value={SHIPPING_FEE} /> per order, added at checkout.

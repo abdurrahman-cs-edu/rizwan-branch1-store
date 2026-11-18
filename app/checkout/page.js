@@ -224,7 +224,7 @@ export default function CheckoutPage() {
           <span>Shipping</span>
           <span><Price value={SHIPPING_FEE} /></span>
         </div>
-        <div className="flex items-baseline justify-between pt-2 text-lg font-semibold text-stone-900">
+        <div className="flex items-baseline justify-between pt-2 text-lg font-normal text-stone-900">
           <span>Total</span>
           <span>
             <span className="mr-2 text-xs font-normal text-stone-500">PKR</span>

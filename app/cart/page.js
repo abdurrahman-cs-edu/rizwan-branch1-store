@@ -53,7 +53,7 @@ export default function CartPage() {
                   <button type="button" className="ml-4 text-xs text-red-600 underline transition-opacity hover:opacity-70" onClick={() => start(key, () => remove(key))}>Remove</button>
                 </div>
               </div>
-              <div key={l.qty} className="pop text-sm font-semibold"><Price value={l.price * l.qty} /></div>
+              <div key={l.qty} className="pop text-sm"><Price value={l.price * l.qty} /></div>
             </div>
             </AnimatedRow>
           );
@@ -63,7 +63,7 @@ export default function CartPage() {
       <div className="mt-6 rounded-lg bg-stone-50 p-4">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span key={subtotal} className="pop font-semibold"><Price value={subtotal} /></span>
+          <span key={subtotal} className="pop"><Price value={subtotal} /></span>
         </div>
         <p className="mt-1 text-xs text-green-700">
           Choose Advance / prepaid payment at checkout to get an additional {PREPAID_DISCOUNT_PERCENT}% discount.

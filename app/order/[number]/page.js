@@ -54,7 +54,7 @@ export default function OrderConfirmation() {
             {order.shipping > 0 && (
               <div className="flex justify-between"><span>Shipping</span><span><Price value={order.shipping} /></span></div>
             )}
-            <div className="flex justify-between font-semibold"><span>Total</span><span><Price value={order.total} /></span></div>
+            <div className="flex justify-between"><span>Total</span><span><Price value={order.total} /></span></div>
           </div>
           <p className="mt-3 text-stone-600">
             Deliver to: {order.name}, {order.city} ({order.phone})
