@@ -110,7 +110,7 @@ export default function CartDrawer() {
         <div className="space-y-2 border-t border-stone-200 p-4">
           <div className="flex justify-between text-sm">
             <span>Subtotal</span>
-            <span key={subtotal} className="pop font-semibold"><Price value={subtotal} /></span>
+            <span key={subtotal} className="pop"><Price value={subtotal} /></span>
           </div>
           <Link
             href="/cart"

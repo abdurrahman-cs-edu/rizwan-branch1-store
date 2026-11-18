@@ -141,13 +141,13 @@ function QuickViewModal({ product, open, onClose }) {
 
           <div className="mt-3">
             {onSale ? (
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-2 text-lg font-light">
                 <span className="text-stone-400 line-through"><Price value={product.price} /></span>
-                <span className="font-semibold text-red-600"><Price value={effectivePrice(product)} /></span>
+                <span className="text-red-600"><Price value={effectivePrice(product)} /></span>
                 <SaleTag p={product} />
               </p>
             ) : (
-              <p className="font-medium"><Price value={product.price} /></p>
+              <p className="text-lg font-light text-stone-700"><Price value={product.price} /></p>
             )}
           </div>
 

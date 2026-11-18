@@ -79,7 +79,7 @@ export default function ProductCard({ p, index = 0 }) {
           {onSale ? (
             <>
               <span className="mr-2 text-stone-400 line-through"><Price value={p.price} /></span>
-              <span className="font-normal text-red-600"><Price value={effectivePrice(p)} /></span>
+              <span className="text-red-600"><Price value={effectivePrice(p)} /></span>
             </>
           ) : (
             <span className="text-stone-700"><Price value={p.price} /></span>
