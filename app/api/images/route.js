@@ -18,6 +18,16 @@ function config() {
   return { host: `${account}.r2.cloudflarestorage.com`, accessKeyId, secretAccessKey, bucket, publicUrl: publicUrl.replace(/\/+$/, "") };
 }
 
+// R2 answers errors as a small XML text with <Code>Name</Code>. Only that code is passed on (admin only), never the keys.
+async function r2Code(res) {
+  try {
+    const text = await res.text();
+    return (text.match(/<Code>([A-Za-z]{1,60})<\/Code>/) || [])[1] || "";
+  } catch {
+    return "";
+  }
+}
+
 const json = (body, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 
 // Asks Supabase whether the signed-in user is an admin (the same check the admin panel uses)
@@ -60,10 +70,17 @@ export async function POST(request) {
   if (body.length === 0) return json({ error: "empty" }, 400);
   if (body.length > MAX_BYTES) return json({ error: "too-big" }, 413);
 
-  const res = await r2Fetch(cfg, "PUT", key, { headers: { "content-type": type, "cache-control": "public, max-age=31536000, immutable" }, body });
+  let res;
+  try {
+    res = await r2Fetch(cfg, "PUT", key, { headers: { "content-type": type, "cache-control": "public, max-age=31536000, immutable" }, body });
+  } catch {
+    console.error("R2 upload failed: could not reach R2");
+    return json({ error: "upload-failed", code: "CannotReachR2" }, 502);
+  }
   if (!res.ok) {
-    console.error("R2 upload failed", res.status);
-    return json({ error: "upload-failed" }, 502);
+    const code = await r2Code(res);
+    console.error("R2 upload failed", res.status, code);
+    return json({ error: "upload-failed", code: code || String(res.status) }, 502);
   }
   return json({ url: `${cfg.publicUrl}/${key}` });
 }
@@ -96,10 +113,17 @@ export async function DELETE(request) {
       skipped++;
       continue;
     }
-    const res = await r2Fetch(cfg, "DELETE", key);
+    let res;
+    try {
+      res = await r2Fetch(cfg, "DELETE", key);
+    } catch {
+      console.error("R2 delete failed: could not reach R2");
+      skipped++;
+      continue;
+    }
     if (res.ok || res.status === 404) deleted++;
     else {
-      console.error("R2 delete failed", res.status);
+      console.error("R2 delete failed", res.status, await r2Code(res));
       skipped++;
     }
   }
