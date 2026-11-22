@@ -13,6 +13,10 @@ Built with Next.js (App Router), Tailwind CSS and Supabase.
 
 ## Rules
 
-- Only public Supabase values (URL and publishable key) are used here.
+- Only public Supabase values (URL and publishable key) are used in the code and in `.env.local`.
 - Never add the `service_role` key, passwords or PINs to this project.
+- Photos: the admin panel uploads to Cloudflare R2 through `/api/images` once these five variables are set in Vercel
+  (Project > Settings > Environment Variables): `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`,
+  `R2_PUBLIC_URL`. They are server-only secrets: set them in Vercel, never in the repo. Until they are all set, photos go to
+  Supabase Storage as before. Photos already in Supabase Storage keep working.
 - Work on a branch, check the Vercel preview, then merge to `main`.
