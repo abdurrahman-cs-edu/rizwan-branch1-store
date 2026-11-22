@@ -108,7 +108,7 @@ export default async function ProductPage({ params }) {
       <DemoNotice show={isDemo} />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-8 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:gap-12">
