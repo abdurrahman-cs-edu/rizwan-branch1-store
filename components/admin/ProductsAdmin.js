@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatPKR } from "@/lib/products";
 import { FABRIC_SUGGESTIONS, SEASONS, SIZES } from "@/lib/config";
-import { BUCKET, resizeImage, slugify, storagePathFromUrl } from "@/lib/adminHelpers";
+import { resizeImage, slugify } from "@/lib/adminHelpers";
+import { removeImages, uploadImage } from "@/lib/imageStorage";
 
 const EMPTY = {
   id: null,
@@ -29,8 +30,7 @@ const EMPTY = {
 };
 
 async function removeFiles(urls) {
-  const paths = urls.map(storagePathFromUrl).filter(Boolean);
-  if (paths.length > 0) await supabase.storage.from(BUCKET).remove(paths);
+  await removeImages(urls);
 }
 
 export default function ProductsAdmin() {
@@ -137,12 +137,7 @@ export default function ProductsAdmin() {
       for (let i = 0; i < files.length; i++) {
         const { blob, ext, contentType } = await resizeImage(files[i]);
         const path = `${folder}/${Date.now()}-${i}.${ext}`;
-        const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
-          contentType,
-          cacheControl: "31536000",
-        });
-        if (error) throw error;
-        urls.push(supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl);
+        urls.push(await uploadImage(path, blob, contentType));
       }
       setUploaded((u) => [...u, ...urls]);
       setForm((f) => ({ ...f, images: [...f.images, ...urls] }));

@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { BUCKET, resizeImage, storagePathFromUrl } from "@/lib/adminHelpers";
+import { resizeImage } from "@/lib/adminHelpers";
+import { removeImages, uploadImage } from "@/lib/imageStorage";
 
 // Customer feedback: upload WhatsApp screenshots. They show on the home page (top)
 // and on suit pages (general ones everywhere, tagged ones only on that suit).
@@ -43,19 +44,14 @@ export default function ReviewsAdmin() {
         // Screenshots keep more detail than product photos so the chat text stays readable.
         const { blob, ext, contentType } = await resizeImage(files[i], 2000, 0.85);
         const path = `reviews/${Date.now()}-${i}.${ext}`;
-        const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, blob, {
-          contentType,
-          cacheControl: "31536000",
-        });
-        if (upErr) throw upErr;
-        const url = supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+        const url = await uploadImage(path, blob, contentType);
         const { error: insErr } = await supabase.from("reviews").insert({
           image_url: url,
           caption: newCaption.trim() || null,
           product_slug: newSlug || null,
         });
         if (insErr) {
-          await supabase.storage.from(BUCKET).remove([path]);
+          await removeImages([url]);
           throw insErr;
         }
         done++;
@@ -79,8 +75,7 @@ export default function ReviewsAdmin() {
     if (!window.confirm("Delete this feedback screenshot for good? Use Hide if you only want it off the website.")) return;
     const { error } = await supabase.from("reviews").delete().eq("id", r.id);
     if (error) return setMessage("Could not delete it.");
-    const path = storagePathFromUrl(r.image_url);
-    if (path) await supabase.storage.from(BUCKET).remove([path]);
+    await removeImages([r.image_url]);
     setMessage("Deleted.");
     load();
   }

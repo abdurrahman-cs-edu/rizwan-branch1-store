@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { BUCKET, resizeImage, storagePathFromUrl } from "@/lib/adminHelpers";
+import { resizeImage } from "@/lib/adminHelpers";
+import { removeImages, uploadImage } from "@/lib/imageStorage";
 
 const KEY = "home_slides";
 const OLD_KEY = "home_cover"; // the single cover photo used before the slideshow existed
@@ -96,16 +97,15 @@ export default function HeroSlidesAdmin() {
     if (files.length === 0) return;
     setBusy(true);
     setMessage("");
-    const uploadedPaths = [];
+    const uploadedUrls = [];
     try {
       const added = [];
       for (const [k, file] of files.entries()) {
         const { blob, ext, contentType } = await resizeImage(file, 1920, 0.8);
         const path = `slides/${Date.now()}-${k}.${ext}`;
-        const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, blob, { contentType, cacheControl: "31536000" });
-        if (upErr) throw upErr;
-        uploadedPaths.push(path);
-        added.push(withId({ url: supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl }));
+        const url = await uploadImage(path, blob, contentType);
+        uploadedUrls.push(url);
+        added.push(withId({ url }));
       }
       const next = [...slides, ...added];
       const error = await persist(next, dark);
@@ -116,7 +116,7 @@ export default function HeroSlidesAdmin() {
       setDirty(false);
       setMessage(`${added.length} photo${added.length > 1 ? "s" : ""} added and saved. Now choose which part of each photo should show.`);
     } catch {
-      if (uploadedPaths.length) await supabase.storage.from(BUCKET).remove(uploadedPaths);
+      if (uploadedUrls.length) await removeImages(uploadedUrls);
       setMessage("Could not save the photo. Please try again.");
     }
     setBusy(false);
@@ -139,8 +139,7 @@ export default function HeroSlidesAdmin() {
     const next = slides.filter((_, k) => k !== sel);
     const error = await persist(next, dark);
     if (!error) {
-      const path = storagePathFromUrl(current.url);
-      if (path) await supabase.storage.from(BUCKET).remove([path]);
+      await removeImages([current.url]);
       setSlides(next);
       setSel(Math.max(0, Math.min(sel, next.length - 1)));
       setNotSaved(false);
